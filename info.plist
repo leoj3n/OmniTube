@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>co.nf.ritashugisha.omnitube</string>
+	<string>co.nf.ritashugisha.omnitube.white</string>
 	<key>connections</key>
 	<dict>
 		<key>0F381716-8CEF-4830-90B8-DF4AE7E5408A</key>
@@ -239,6 +239,14 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
+				<string>D8D464D3-E7C5-4B67-8CC1-91B32AE1358C</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>8E407271-48E6-4BBB-B565-304FC6B66E03</string>
 				<key>modifiers</key>
 				<integer>1048576</integer>
@@ -249,9 +257,9 @@
 				<key>destinationuid</key>
 				<string>A335E843-9469-4735-A072-025FD0BE7901</string>
 				<key>modifiers</key>
-				<integer>0</integer>
+				<integer>131072</integer>
 				<key>modifiersubtext</key>
-				<string></string>
+				<string>Open "{query}" in default browser</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -259,7 +267,7 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -450,7 +458,7 @@
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>OmniTube</string>
+	<string>OmniTube White</string>
 	<key>objects</key>
 	<array>
 		<dict>

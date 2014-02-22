@@ -57,7 +57,7 @@ def getHistory():
 	if gdataResults:
 		feed.add_item(u'\u2329Clear History\u232A', '', '{\'key\':\'wipehistory\'}', '', '', '%sErase.png' % OmniUtil.ICONS)
 		for i in gdataResults:
-			feed.add_item(i['title']['$t'], '%s - %s' % (i['author'][0]['name']['$t'],
+			feed.add_item(i['title']['$t'], '%s - %s' % (i['media$group']['media$credit'][0]['yt$display'],
 				OmniUtil.secondsToHuman(int(i['media$group']['yt$duration']['seconds']))),
 				'http://www.youtube.com/watch?v=%s' % i['media$group']['yt$videoid']['$t'], '', '',
 				'%sListBlock.png' % OmniUtil.ICONS)
