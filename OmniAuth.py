@@ -66,13 +66,26 @@ If OmniTube is not authorized (isAuthorized()) then begin authorization process.
 def testAuthorization():
 	import OmniUtil
 	if not isAuthorized():
-		newAuth = splinter.browser.Browser(driver_name = 'firefox')
+		defaultBrowser = OmniUtil.getDefaultBrowser()
+		if 'com.google.chrome' in defaultBrowser:
+			newAuth = splinter.browser.Browser(driver_name = 'chrome', executable_path = '%s/Resources/webdrivers/chromedriver' % OmniUtil.WORKFLOW)
+		elif 'org.mozilla.firefox' in defaultBrowser:
+			newAuth = splinter.browser.Browser(driver_name = 'firefox')
+		else:
+			OmniUtil.displayDialog(OmniUtil.TITLE, 
+				'%s browser currently not supported!\n\nOmniTube will default to Firefox to authenticate your profile.' % defaultBrowser, 
+				['Ok'], 'Ok', 0)
+			newAuth = splinter.browser.Browser(driver_name = 'firefox')
 		requestsLoad = {'client_id':base64.b64decode(OmniUtil.CLIENT_ID),
 			'redirect_uri':'urn:ietf:wg:oauth:2.0:oob',
 			'scope':'https://www.googleapis.com/auth/youtube',
 			'response_type':'code',
 			'access_type':'offline'}
-		newAuth.visit('%s?%s' % (OmniUtil.BASE_OAUTH, urllib.urlencode(requestsLoad)))	
+		newAuth.visit('%s?%s' % (OmniUtil.BASE_OAUTH, urllib.urlencode(requestsLoad)))
+		if 'Chrome' in newAuth.driver_name:
+			OmniUtil.__runProcess__('osascript -e \'%s\'' % 'tell application "System Events" to tell process "Chrome" to set frontmost to true')
+		else:
+			OmniUtil.__runProcess__('osascript -e \'%s\'' % 'tell application "System Events" to tell process "firefox-bin" to set frontmost to true')
 		while 'success code' not in newAuth.title.lower():
 			pass
 		requestsLoad = {'code':newAuth.title.split('=')[-1],
@@ -86,7 +99,7 @@ def testAuthorization():
 		newAuth.quit()
 		OmniUtil.introHtmlOpen()
 		OmniUtil.introLoadThumbs()
-		
+			
 """
 .. py:function:: refreshToken()
 Refresh the access token if it is not valid (isValid()).

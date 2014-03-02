@@ -20,6 +20,7 @@
 # along with OmniTube. If not, see <http://www.gnu.org/licenses/>.
 
 import os, ast, json, subprocess, base64
+import plistlib, shutil, tempfile
 import urllib, urlparse, webbrowser
 import xml.etree.ElementTree as etree
 
@@ -63,7 +64,7 @@ def __formatSpaces__(string):
 	return string.replace(' ', '\ ')
 
 TITLE         = 'OmniTube'
-VERSION       = 1.0
+VERSION       = 1.1
 WORKFLOW      = os.path.dirname(os.path.abspath(__file__))
 NOTIFIER      = __formatSpaces__('%s/Resources/Notifier.app/Contents/MacOS/terminal-notifier' % WORKFLOW)
 ICONS	 	  = '%s/Resources/Icons/' % WORKFLOW
@@ -73,6 +74,8 @@ DEVELOPER_KEY = 'QUkzOXNpN3RFWGM3dXVYbWNEU255a2pkdWxjOXotY3Q2cC11REdWYURnM0U0MXZ
 CLIENT_ID     = 'NDk0NDY3MDg2NjMxLTZ0cDRrbjk4dGZoNXI5NnAyYTFkNmNlNXUzNm10N2hyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t'
 CLIENT_SECRET = 'WDNlc3VqVklwWDVsc3pOdVpuMjcxUmoz'
 INTRO_HTML    = 'file:///%s/OAuthHTML/index.html' % WORKFLOW
+SETTINGS      = '%s/Resources/Settings/' % WORKFLOW
+DEFAULT_BROWSER = '%s/defaultBrowser' % SETTINGS
 BASE_1        	   = 'https://accounts.google.com/o/oauth2'
 BASE_2        	   = 'https://gdata.youtube.com/feeds/api'
 BASE_OAUTH         = '%s/auth' % BASE_1
@@ -140,6 +143,25 @@ def displayNotification(title, subtitle, message, execute):
 	__runProcess__(notifyCmd)
 
 """
+.. py:function:: displayDialog(title, message, buttons, defaultButton, icon)
+Display an applescript dialog box.
+
+:param str title: Title of dialog
+:param str message: Message of dialog
+:param array buttons: Array of button names (str)
+:param str defaultButton: Name of default button
+:param int/str icon: String or int of icon
+"""
+def displayDialog(title, message, buttons, defaultButton, icon):
+	buttons = '{"%s"}' % '", "'.join(buttons)
+	dialogCmd = 'display dialog "%s" with title "%s" buttons %s default button "%s"' % (message, title, buttons, defaultButton)
+	if isinstance(icon, int):
+		dialogCmd = '%s with icon %s' % (dialogCmd, icon)
+	else:
+		dialogCmd = '%s with icon "%s"' % (dialogCmd, icon)
+	__runProcess__('osascript -e \'%s\'' % dialogCmd)
+
+"""
 .. py:function:: jsonLoad(baseUrl)
 Get the returned YouTube load from the baseURL query.
 
@@ -182,6 +204,24 @@ def gdataLoad(baseURL, tag1 = 'feed', tag2 = 'entry', param1 = {}):
 		return gdataResults
 
 """
+.. py:function:: getDefaultBrowser()
+Retrieve the system's default web browser's name.
+
+:returns: Name of user's default browser
+:rtype: str
+"""
+def getDefaultBrowser():
+	tempLaunchServices = tempfile.mkstemp(suffix = '.plist', dir = os.path.expanduser('/tmp/'))[1]
+	shutil.copy('%s/Library/Preferences/com.apple.LaunchServices.plist' % os.path.expanduser('~'), tempLaunchServices)
+	subprocess.call(['plutil', '-convert', 'xml1', tempLaunchServices])
+	for i in plistlib.readPlist(tempLaunchServices)['LSHandlers']:
+		if 'LSHandlerURLScheme' in i and 'http' in i['LSHandlerURLScheme']:
+			defaultBrowser = i['LSHandlerRoleAll']
+			break
+	__runProcess__('rm -rf %s' % tempLaunchServices)
+	return defaultBrowser
+
+"""
 .. py:function:: retrieveThumb(userID)
 Retrieve a channel's thumbnail image and save it to subscriptions folder.
 
@@ -195,7 +235,17 @@ def retrieveThumb(userID):
 Open the intro HTML in the user's default browser.
 """
 def introHtmlOpen():
-	webbrowser.open(INTRO_HTML)
+	defaultBrowser = getDefaultBrowser()
+	if 'org.mozilla.firefox' in defaultBrowser:
+		defaultBrowser = 'Firefox'
+	elif 'com.apple.safari' in defaultBrowser:
+		defaultBrowser = 'Safari'
+	elif 'com.google.chrome' in defaultBrowser:
+		defaultBrowser = 'Google Chrome'
+	else:
+		defaultBrowser = 'Safari'
+	__runProcess__('osascript -e \'tell application "%s" to open location "%s"\'' % (defaultBrowser, urllib.quote(INTRO_HTML).replace('%3A', ':')))
+	__runProcess__('osascript -e \'tell application "System Events" to set frontmost of process "%s" to true\'' % defaultBrowser)
 	
 """
 .. py:function:: introLoadThumbs()
@@ -286,6 +336,10 @@ def validStart():
 	import OmniAuth
 	if not os.path.exists('%s/Resources/' % WORKFLOW):
 		__runProcess__('mkdir %s' % __formatSpaces__('%s/Resources/' % WORKFLOW))
+	#if not os.path.exists('%s/Resources/Settings' % WORKFLOW):
+	#	__runProcess__('mkdir %s' % __formatSpaces__('%s/Resources/Settings' % WORKFLOW))
+	#if not os.path.exists('%s/Resources/Settings/defaultBrowser' % WORKFLOW):
+	#	__runProcess__('touch %s' % '%s/Resources/Settings/defaultBrowser' % WORKFLOW)
 	if not os.path.exists(ICONS):
 		__runProcess__('mkdir %s' % __formatSpaces__(ICONS))
 	if not os.path.exists(SUBSCRIPTIONS):
