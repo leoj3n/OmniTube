@@ -1,0 +1,184 @@
+#!/usr/bin/env python
+#-*- coding:UTF-8 -*-
+#
+# @author  Ritashugisha
+# @contact ritashugisha@gmail.com
+#
+# This file is part of GlyphSetup.
+#
+# GlyphSetup is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GlyphSetup is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GlyphSetup. If not, see <http://www.gnu.org/licenses/>.
+
+import os
+import sys
+import argparse
+import subprocess
+
+"""
+.. py:class:: GlyphSetup()
+Setup glyphs for dark or light themes in Alfred 2.
+"""
+class GlyphSetup():
+	
+	"""
+	.. py:function:: __runProcess__(self, procCmd)
+	Run a system subprocess.
+	
+	:param GlyphSetup self: GlyphSetup object
+	:param str procCmd: The command to be run
+	"""
+	def __runProcess__(self, procCmd):
+		proc = subprocess.Popen([procCmd], stdout = subprocess.PIPE, shell = True)
+		(proc, proc_e) = proc.communicate()
+		return proc
+	
+	"""
+	.. py:function:: __formatSpaces__(self, string)
+	Format a string by escaping all spaces.
+	
+	:param GlyphSetup self: GlyphSetup object
+	:param str string: The string to be formatted
+	"""
+	def __formatSpaces__(self, string):
+		return string.replace(' ', '\ ')
+	
+	"""
+	.. py:function:: onError(self, eMsg, eExit = False)
+	Print out an error to stdout.
+	
+	:param GlyphSetup self: GlyphSetup object
+	:param str eMsg: Message to be printed
+	:param bool eExit: Boolean value if system should exit after print
+	"""
+	def onError(self, eMsg, eExit = False):
+		sys.stdout.write('GlyphSetupError: %s\n' % eMsg)
+		if eExit:
+			sys.exit(0)
+	
+	"""
+	.. py:__init__(self, alfred2theme_exec = '')
+	Initialize the GlyphSetup object.
+	
+	:param GlyphSetup self: GlyphSetup object
+	:param str lightFix: Postfix of what light icons are (or should) be
+	:param str darkFix: Postfix of what dark icons are (or should) be
+	:param str alfred2theme_exec: Path to Alfred2Theme executable (optional)
+	"""
+	def __init__(self, lightFix, darkFix, alfred2theme_exec = ''):
+		self.lightFix = '-%s' % lightFix
+		self.darkFix = '-%s' % darkFix
+		self.currentPath = os.path.dirname(os.path.abspath(__file__))
+		self.alfred2theme = None
+		self.darkTheme = False
+		self.darkIcons = False
+		self.commonRev = {}
+		self.configure(alfred2theme_exec)
+		
+	"""
+	.. py:function:: configure(self, alfred2theme_exec)
+	Configure the GlyphSetup object.
+	
+	:param GlyphSetup self: GlyphSetup object
+	:param str alfred2theme_exec: Path to Alfred2Theme executable (optional)
+	"""
+	def configure(self, alfred2theme_exec):
+		if not alfred2theme_exec:
+			for r, d, f in os.walk(self.currentPath):
+				for files in f:
+					if 'co.nf.ritashugisha.alfred2themeanalytics' in files.lower():
+						self.alfred2theme = '%s/%s' % (r, files)
+			if not self.alfred2theme:
+				self.onError('could not locate Alfred2Theme executable', eExit = True)
+		else:
+			if os.path.exists(alfred2theme_exec):
+				self.alfred2theme = alfred2theme_exec
+			else:
+				self.onError('path to executable does not exist', eExit = True)
+		if 'alfred.theme.dark' in self.__runProcess__(self.__formatSpaces__(self.alfred2theme)).split('\n')[0]:
+			self.darkTheme = True
+		darkIconsTmp = False
+		for r, d, f in os.walk(self.currentPath):
+			for files in f:
+				if '%s.png' % self.lightFix in files[-10:]:
+					darkIconsTmp = True
+				if '%s.png' % self.darkFix in files[-9:] and darkIconsTmp:
+					self.onError('malformed reverse icon filename "%s"\n' % files, eExit = True)
+		if darkIconsTmp:
+			self.darkIcons = True
+		
+	"""
+	.. py:function:: indexIcons(self)
+	Index all icons that should be exchanged.
+	
+	:param GlyphSetup self: GlyphSetup object
+	"""	
+	def indexIcons(self):
+		postFix = self.darkFix
+		if self.darkIcons:
+			postFix = self.lightFix
+		for r, d, f in os.walk(self.currentPath):
+			for files in f:
+				if postFix in os.path.splitext(files)[0][-len(postFix):]:
+					self.commonRev['%s/%s' % (r, files)] = '%s%s' % (os.path.splitext('%s/%s' % (r, files))[0].replace(postFix, ''), 
+						os.path.splitext('%s/%s' % (r, files))[1])
+		for k, v in self.commonRev.iteritems():
+			if not os.path.exists(v):
+				self.onError('missing reverse icon "%s"' % v, eExit = True)
+	
+	"""
+	.. py:function:: commitRev(self)
+	Exchange all icons listed by self.indexIcons.
+	
+	:param GlyphSetup self: GlyphSetup object
+	"""
+	def commitRev(self):
+		postFix = self.darkFix
+		newFix  = self.lightFix
+		if self.darkIcons:
+			saveNewFix = newFix
+			newFix = postFix
+			postFix = saveNewFix
+		if (self.darkIcons and self.darkTheme) or (not self.darkIcons and not self.darkTheme):
+			for k, v in self.commonRev.iteritems():
+				save_v = v
+				self.__runProcess__('mv %s %s%s%s\n' % (self.__formatSpaces__(v), 
+					self.__formatSpaces__(os.path.splitext(v)[0]), 
+					newFix, 
+					os.path.splitext(v)[1]))
+				self.__runProcess__('mv %s %s\n' % (self.__formatSpaces__(k), 
+					self.__formatSpaces__(save_v)))
+
+"""
+.. py:function:: logic()
+Run argument parser for command-line argument
+"""		
+def logic():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--light', help = 'what postfix do (or should) light icons have')
+	parser.add_argument('--dark', help = 'what postfix do (or should) dark icons have')
+	parser.add_argument('--executable', help = '\n'.join(['path to "co.nf.ritashugisha.Alfred2ThemeAnalytics" executable', 
+		'(optional -> put "co.nf.ritashugisha.Alfred2ThemeAnalytics" in same directory as this exec)']))
+	args = parser.parse_args()
+	if not args.light or not args.dark:
+		parser.print_usage()
+		sys.exit(0)
+	else:
+		if args.executable:
+			newSetup = GlyphSetup(args.light, args.dark, args.executable)
+		else:
+			newSetup = GlyphSetup(args.light, args.dark)
+		newSetup.indexIcons()
+		newSetup.commitRev()
+	
+if __name__ in '__main__':
+	logic()

@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with OmniTube. If not, see <http://www.gnu.org/licenses/>.
 
-import base64, json
+import sys, base64, json
 import requests, splinter, urllib
 
 """
@@ -72,10 +72,11 @@ def testAuthorization():
 		elif 'org.mozilla.firefox' in defaultBrowser:
 			newAuth = splinter.browser.Browser(driver_name = 'firefox')
 		else:
-			OmniUtil.displayDialog(OmniUtil.TITLE, 
-				'%s browser currently not supported!\n\nOmniTube will default to Firefox to authenticate your profile.' % defaultBrowser, 
-				['Ok'], 'Ok', 0)
-			newAuth = splinter.browser.Browser(driver_name = 'firefox')
+			if OmniUtil.cocoaMsgBox('%s browser currently not supported!' % defaultBrowser, 
+				'Your browser is not supported for authentication.\nOmniTube will default to Firefox to authenticate your profile.', '%sWarning.png' % OmniUtil.ICONS):
+				newAuth = splinter.browser.Browser(driver_name = 'firefox')
+			else:
+				sys.exit(0)
 		requestsLoad = {'client_id':base64.b64decode(OmniUtil.CLIENT_ID),
 			'redirect_uri':'urn:ietf:wg:oauth:2.0:oob',
 			'scope':'https://www.googleapis.com/auth/youtube',
@@ -99,7 +100,7 @@ def testAuthorization():
 		newAuth.quit()
 		OmniUtil.introHtmlOpen()
 		OmniUtil.introLoadThumbs()
-			
+	
 """
 .. py:function:: refreshToken()
 Refresh the access token if it is not valid (isValid()).

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>co.nf.ritashugisha.omnitube.white</string>
+	<string>co.nf.ritashugisha.omnitube</string>
 	<key>connections</key>
 	<dict>
 		<key>0F381716-8CEF-4830-90B8-DF4AE7E5408A</key>
@@ -18,19 +18,70 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
-				<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
-				<key>modifiers</key>
-				<integer>8388608</integer>
-				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
 				<string>CCF89499-4E5E-42E8-800F-EDAD012517EB</string>
 				<key>modifiers</key>
 				<integer>524288</integer>
 				<key>modifiersubtext</key>
 				<string>View recent uploads from "{query}"</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
+				<key>modifiers</key>
+				<integer>8388608</integer>
+				<key>modifiersubtext</key>
+				<string>Copy "{query}" to clipboard</string>
+			</dict>
+		</array>
+		<key>16846FDB-5C58-4C09-985A-6F8BA4134EC9</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>8E407271-48E6-4BBB-B565-304FC6B66E03</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Download "{query}" using Luxinate</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A335E843-9469-4735-A072-025FD0BE7901</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
+				<key>modifiers</key>
+				<integer>8388608</integer>
+				<key>modifiersubtext</key>
+				<string>Copy "{query}" to clipboard</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>84947FB0-1D6A-45BB-A91A-B610494117CA</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string>Add "{query}" to Favorites</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>952570E6-A7F8-404B-B680-607DB42FE262</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string>Add "{query}" to Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
 			</dict>
 		</array>
 		<key>1F1FD2C5-5F70-4642-99F0-AB8FA31B64CE</key>
@@ -53,19 +104,19 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
-				<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
-				<key>modifiers</key>
-				<integer>8388608</integer>
-				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
 				<string>CCF89499-4E5E-42E8-800F-EDAD012517EB</string>
 				<key>modifiers</key>
 				<integer>524288</integer>
 				<key>modifiersubtext</key>
 				<string>View recent uploads from "{query}"</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
+				<key>modifiers</key>
+				<integer>8388608</integer>
+				<key>modifiersubtext</key>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 		</array>
 		<key>2B0DF474-0418-42F1-A91C-913FFEAAC4E3</key>
@@ -103,7 +154,58 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>DCEA6EFA-3E1E-4B9A-B210-F9BDFF504381</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string>View feed of videos in "{query}"</string>
+			</dict>
+		</array>
+		<key>40FD0E44-8446-48B3-82B3-498219417265</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>D8D464D3-E7C5-4B67-8CC1-91B32AE1358C</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>8DAA77D2-83C1-4500-9457-A8C49ABAAD34</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Download all videos using Luxinate</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
+				<key>modifiers</key>
+				<integer>8388608</integer>
+				<key>modifiersubtext</key>
+				<string>Copy "{query}" to clipboard</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>08C1F880-6DA2-4DA7-B54C-E5E15695459E</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string>Delete playlist "{query}"</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>49B24AE2-1E5F-4D37-9A6A-80EDE005AE50</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string>View feed of videos in "{query}"</string>
 			</dict>
 		</array>
 		<key>4DC15C66-20F2-407D-8DE9-F44449015216</key>
@@ -130,7 +232,7 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -147,6 +249,14 @@
 				<integer>262144</integer>
 				<key>modifiersubtext</key>
 				<string>Add "{query}" to Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
 			</dict>
 		</array>
 		<key>69C67274-4A8B-4CD6-9647-015C7FFCABD2</key>
@@ -173,7 +283,7 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -190,6 +300,14 @@
 				<integer>262144</integer>
 				<key>modifiersubtext</key>
 				<string>Add "{query}" to Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
 			</dict>
 		</array>
 		<key>7229B5DF-A04C-4EB5-987A-FA71135C2216</key>
@@ -216,7 +334,7 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -233,6 +351,14 @@
 				<integer>262144</integer>
 				<key>modifiersubtext</key>
 				<string>Add "{query}" to Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
 			</dict>
 		</array>
 		<key>99FD5894-7B8B-4E24-8847-FBADB6A910F6</key>
@@ -252,14 +378,6 @@
 				<integer>1048576</integer>
 				<key>modifiersubtext</key>
 				<string>Download "{query}" using Luxinate</string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>A335E843-9469-4735-A072-025FD0BE7901</string>
-				<key>modifiers</key>
-				<integer>131072</integer>
-				<key>modifiersubtext</key>
-				<string>Open "{query}" in default browser</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -284,6 +402,14 @@
 				<integer>262144</integer>
 				<key>modifiersubtext</key>
 				<string>Add "{query}" to Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
 			</dict>
 		</array>
 		<key>A6EA731E-EE99-4A4B-9B3B-C2AA0736E63F</key>
@@ -310,7 +436,7 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -327,6 +453,14 @@
 				<integer>262144</integer>
 				<key>modifiersubtext</key>
 				<string>Add "{query}" to Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
 			</dict>
 		</array>
 		<key>AA3E6198-6F87-46DF-BB94-0763DE141A50</key>
@@ -371,6 +505,14 @@
 				<key>modifiersubtext</key>
 				<string>Add "{query}" to Watch Later</string>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
+			</dict>
 		</array>
 		<key>ED8E2785-9C77-40FE-997A-12ABA4B01044</key>
 		<array>
@@ -396,7 +538,7 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -405,6 +547,65 @@
 				<integer>262144</integer>
 				<key>modifiersubtext</key>
 				<string>Remove "{query}" from Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
+			</dict>
+		</array>
+		<key>F6B98C46-7A01-4978-B2B4-1A13B0878EA8</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A335E843-9469-4735-A072-025FD0BE7901</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>8DAA77D2-83C1-4500-9457-A8C49ABAAD34</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Download all videos using Luxinate</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
+				<key>modifiers</key>
+				<integer>8388608</integer>
+				<key>modifiersubtext</key>
+				<string>Copy "{query}" to clipboard</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>84947FB0-1D6A-45BB-A91A-B610494117CA</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string>Add "{query}" to Favorites</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>952570E6-A7F8-404B-B680-607DB42FE262</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string>Add "{query}" to Watch Later</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>96116AA9-2682-44D7-9611-E17787CB86A1</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Edit this playlist</string>
 			</dict>
 		</array>
 		<key>FDFD16E7-C040-4E1B-BA7C-DC2A5AB46964</key>
@@ -431,7 +632,7 @@
 				<key>modifiers</key>
 				<integer>8388608</integer>
 				<key>modifiersubtext</key>
-				<string>Add "{query}" to Watch Later</string>
+				<string>Copy "{query}" to clipboard</string>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -449,6 +650,14 @@
 				<key>modifiersubtext</key>
 				<string>Add "{query}" to Watch Later</string>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Add to a specific playlist</string>
+			</dict>
 		</array>
 	</dict>
 	<key>createdby</key>
@@ -458,7 +667,7 @@
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>OmniTube White</string>
+	<string>OmniTube</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -498,7 +707,7 @@ print OmniTube.getFeed()</string>
 				<integer>63</integer>
 				<key>script</key>
 				<string>import OmniUtil
-OmniUtil.priorityOutput(str({query}))</string>
+OmniUtil.priorityOutput("{query}")</string>
 				<key>type</key>
 				<integer>3</integer>
 			</dict>
@@ -733,21 +942,6 @@ OmniUtil.__searchAlfred__('luxplaylist ► ' + '{query}')</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>autopaste</key>
-				<false/>
-				<key>clipboardtext</key>
-				<string>{query}</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.clipboard</string>
-			<key>uid</key>
-			<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>argumenttype</key>
 				<integer>2</integer>
 				<key>escaping</key>
@@ -808,6 +1002,21 @@ OmniTube.removeFavorite('{query}')</string>
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>A3ADA24B-A266-451F-B19C-6F303AB925A5</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>B91622FD-1218-4303-80D4-BE74F6206470</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -988,6 +1197,24 @@ OmniTube.removeWatchLater('{query}')</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>import OmniUtil
+OmniUtil.__searchAlfred__('► playlistfeed ' + '{query}')</string>
+				<key>type</key>
+				<integer>3</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>DCEA6EFA-3E1E-4B9A-B210-F9BDFF504381</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>argumenttype</key>
 				<integer>2</integer>
 				<key>escaping</key>
@@ -1015,11 +1242,178 @@ print OmniTube.getUploads()</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>keyword</key>
+				<string>► playlists</string>
+				<key>runningsubtext</key>
+				<string>Loading...</string>
+				<key>script</key>
+				<string>import OmniTube
+print OmniTube.getPlaylists()</string>
+				<key>subtext</key>
+				<string>View your YouTube playlists</string>
+				<key>title</key>
+				<string>YouTube Playlists</string>
+				<key>type</key>
+				<integer>3</integer>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>40FD0E44-8446-48B3-82B3-498219417265</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>import OmniTube
+OmniTube.removePlaylist('{query}')</string>
+				<key>type</key>
+				<integer>3</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>08C1F880-6DA2-4DA7-B54C-E5E15695459E</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>import OmniUtil
+OmniUtil.__searchAlfred__('► myplaylistfeed ' + '{query}')</string>
+				<key>type</key>
+				<integer>3</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>49B24AE2-1E5F-4D37-9A6A-80EDE005AE50</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>keyword</key>
+				<string>► playlistfeed</string>
+				<key>runningsubtext</key>
+				<string>Loading...</string>
+				<key>script</key>
+				<string>import OmniTube
+print OmniTube.getPlaylistFeed('{query}')</string>
+				<key>subtext</key>
+				<string>View a playlist's feed of videos</string>
+				<key>title</key>
+				<string>YouTube Playlist's Feed</string>
+				<key>type</key>
+				<integer>3</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>16846FDB-5C58-4C09-985A-6F8BA4134EC9</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>import OmniTube
+OmniTube.addToPlaylist('{query}')</string>
+				<key>type</key>
+				<integer>3</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>keyword</key>
+				<string>► myplaylistfeed</string>
+				<key>runningsubtext</key>
+				<string>Loading...</string>
+				<key>script</key>
+				<string>import OmniTube
+print OmniTube.getPlaylistFeed('{query}')</string>
+				<key>subtext</key>
+				<string>View your playlist's feed of videos</string>
+				<key>title</key>
+				<string>YouTube Playlist's Feed</string>
+				<key>type</key>
+				<integer>3</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>F6B98C46-7A01-4978-B2B4-1A13B0878EA8</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>import OmniTube
+OmniTube.removeFromPlaylist('{query}')</string>
+				<key>type</key>
+				<integer>3</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>96116AA9-2682-44D7-9611-E17787CB86A1</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
 	<key>uidata</key>
 	<dict>
+		<key>08C1F880-6DA2-4DA7-B54C-E5E15695459E</key>
+		<dict>
+			<key>ypos</key>
+			<real>1210</real>
+		</dict>
 		<key>0F381716-8CEF-4830-90B8-DF4AE7E5408A</key>
 		<dict>
 			<key>ypos</key>
@@ -1029,6 +1423,11 @@ print OmniTube.getUploads()</string>
 		<dict>
 			<key>ypos</key>
 			<real>1010</real>
+		</dict>
+		<key>16846FDB-5C58-4C09-985A-6F8BA4134EC9</key>
+		<dict>
+			<key>ypos</key>
+			<real>1310</real>
 		</dict>
 		<key>1F1FD2C5-5F70-4642-99F0-AB8FA31B64CE</key>
 		<dict>
@@ -1050,6 +1449,16 @@ print OmniTube.getUploads()</string>
 			<key>ypos</key>
 			<real>510</real>
 		</dict>
+		<key>40FD0E44-8446-48B3-82B3-498219417265</key>
+		<dict>
+			<key>ypos</key>
+			<real>1210</real>
+		</dict>
+		<key>49B24AE2-1E5F-4D37-9A6A-80EDE005AE50</key>
+		<dict>
+			<key>ypos</key>
+			<real>1310</real>
+		</dict>
 		<key>4DC15C66-20F2-407D-8DE9-F44449015216</key>
 		<dict>
 			<key>ypos</key>
@@ -1064,6 +1473,11 @@ print OmniTube.getUploads()</string>
 		<dict>
 			<key>ypos</key>
 			<real>1010</real>
+		</dict>
+		<key>7D1ABBA7-906F-4F53-9A20-C9B9E4D011B0</key>
+		<dict>
+			<key>ypos</key>
+			<real>1410</real>
 		</dict>
 		<key>84947FB0-1D6A-45BB-A91A-B610494117CA</key>
 		<dict>
@@ -1084,6 +1498,11 @@ print OmniTube.getUploads()</string>
 		<dict>
 			<key>ypos</key>
 			<real>910</real>
+		</dict>
+		<key>96116AA9-2682-44D7-9611-E17787CB86A1</key>
+		<dict>
+			<key>ypos</key>
+			<real>1510</real>
 		</dict>
 		<key>99FD5894-7B8B-4E24-8847-FBADB6A910F6</key>
 		<dict>
@@ -1113,7 +1532,7 @@ print OmniTube.getUploads()</string>
 		<key>B91622FD-1218-4303-80D4-BE74F6206470</key>
 		<dict>
 			<key>ypos</key>
-			<real>560</real>
+			<real>710</real>
 		</dict>
 		<key>CCF89499-4E5E-42E8-800F-EDAD012517EB</key>
 		<dict>
@@ -1125,10 +1544,20 @@ print OmniTube.getUploads()</string>
 			<key>ypos</key>
 			<real>110</real>
 		</dict>
+		<key>DCEA6EFA-3E1E-4B9A-B210-F9BDFF504381</key>
+		<dict>
+			<key>ypos</key>
+			<real>1110</real>
+		</dict>
 		<key>ED8E2785-9C77-40FE-997A-12ABA4B01044</key>
 		<dict>
 			<key>ypos</key>
 			<real>810</real>
+		</dict>
+		<key>F6B98C46-7A01-4978-B2B4-1A13B0878EA8</key>
+		<dict>
+			<key>ypos</key>
+			<real>1410</real>
 		</dict>
 		<key>FDFD16E7-C040-4E1B-BA7C-DC2A5AB46964</key>
 		<dict>

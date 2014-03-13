@@ -55,7 +55,7 @@ def getHistory():
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_HISTORY)
 	if gdataResults:
-		feed.add_item(u'\u2329Clear History\u232A', '', '{\'key\':\'wipehistory\'}', '', '', '%sErase.png' % OmniUtil.ICONS)
+		feed.add_item(u'\u2329 Clear History \u232A', '', "{'key':'wipehistory'}", '', '', '%sErase.png' % OmniUtil.ICONS)
 		for i in gdataResults:
 			feed.add_item(i['title']['$t'], '%s - %s' % (i['media$group']['media$credit'][0]['yt$display'],
 				OmniUtil.secondsToHuman(int(i['media$group']['yt$duration']['seconds']))),
@@ -63,6 +63,47 @@ def getHistory():
 				'%sListBlock.png' % OmniUtil.ICONS)
 	else:
 		feed.add_item('No Results', 'No videos in your history could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
+	return feed
+
+"""
+.. py:function:: selectPlaylist(text)
+Select a playlist from the authenticated user's profile.
+
+:param str text: Informative text of dropdown
+:returns: URL of selected playlist
+:rtype: str
+"""
+def selectPlaylist(text):
+	playlistHref = {}
+	items = []
+	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_USER_PLAYLIST)
+	if gdataResults:
+		print gdataResults
+		for i in gdataResults:
+			playlistHref[i['title']['$t']] = 'http://www.youtube.com/playlist?list=%s' % i['yt$playlistId']['$t']
+			items.append(i['title']['$t'])
+		return playlistHref[OmniUtil.cocoaDropdown(text, items, '%s/icon.png' % OmniUtil.WORKFLOW)]
+	else:
+		OmniUtil.cocoaMsgBox('No playlists could be found!', 'Sorry, but no playlists could be found on this account.', '%sWarning.png' % OmniUtil.ICONS)
+		sys.exit(0)
+
+"""
+.. py:function:: getPlaylists()
+Get the authenticated user's playlists.
+
+:returns: Alfred 2 script filter feedback
+:rtype: XML Feedback
+"""
+def getPlaylists():
+	feed = OmniUtil.Feedback()
+	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_USER_PLAYLIST)
+	feed.add_item(u'\u2329 New Playlist \u232A', '', "{'key':'newplaylist'}", '', '', '%sAddList.png' % OmniUtil.ICONS)
+	if gdataResults:
+		for i in gdataResults:
+			feed.add_item(i['title']['$t'], '%s - %s videos' % (i['author'][0]['name']['$t'], i['yt$countHint']['$t']),
+				'http://www.youtube.com/playlist?list=%s' % i['yt$playlistId']['$t'], '', '', '%sListBlock.png' % OmniUtil.ICONS)
+	else:
+		feed.add_item('No Results', 'No playlists on your account could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
 	return feed
 
 """
@@ -82,7 +123,7 @@ def getPopular():
 				'http://www.youtube.com/watch?v=%s' % i['media$group']['yt$videoid']['$t'], '', '', 
 				'%sListBlock.png' % OmniUtil.ICONS)
 	else:
-		feed.add_item('No Results', 'No videos from most popular could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
+		feed.add_item('No Results', 'No videos from "Most Popular" could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
 	return feed
 
 """
@@ -102,7 +143,7 @@ def getFavorites():
 				'http://www.youtube.com/watch?v=%s' % i['media$group']['yt$videoid']['$t'], '', '', 
 				'%sListBlock.png' % OmniUtil.ICONS)
 	else:
-		feed.add_item('No Results', 'No videos from favorites could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
+		feed.add_item('No Results', 'No videos from "Favorites" could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
 	return feed
 
 """
@@ -117,12 +158,12 @@ def getWatchLater():
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_WATCHLATER)
 	if gdataResults:
 		for i in gdataResults:
-			feed.add_item(i['title']['$t'], '%s - %s' % (i['author'][0]['name']['$t'],
+			feed.add_item(i['title']['$t'], '%s - %s' % (i['media$group']['media$credit'][0]['yt$display'],
 				OmniUtil.secondsToHuman(int(i['media$group']['yt$duration']['seconds']))),
 				'http://www.youtube.com/watch?v=%s' % i['media$group']['yt$videoid']['$t'], '', '', 
 				'%sListBlock.png' % OmniUtil.ICONS)
 	else:
-		feed.add_item('No Results', 'No videos from favorites could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
+		feed.add_item('No Results', 'No videos from "Watch Later" could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
 	return feed
 
 """
@@ -142,7 +183,7 @@ def getUploads():
 				'http://www.youtube.com/watch?v=%s' % i['media$group']['yt$videoid']['$t'], '', '', 
 				'%sListBlock.png' % OmniUtil.ICONS)
 	else:
-		feed.add_item('No Results', 'No videos from favorites could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
+		feed.add_item('No Results', 'No videos from your uploads could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
 	return feed
 
 """
@@ -157,6 +198,27 @@ def getChannelFeed(query):
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_USER_UPLOADS % OmniUtil.__urlParse__(query).path.split('/')[-1], 
 		param1 = {'orderby':'published'})
+	if gdataResults:
+		for i in gdataResults:
+			feed.add_item(i['title']['$t'], '%s - %s' % (i['media$group']['media$credit'][0]['yt$display'], 
+				OmniUtil.secondsToHuman(int(i['media$group']['yt$duration']['seconds']))), 
+				'http://www.youtube.com/watch?v=%s' % i['media$group']['yt$videoid']['$t'], '', '', 
+				'%sListBlock.png' % OmniUtil.ICONS)
+	else:
+		feed.add_item('No Results', 'No feed results for "%s" could be found' % query, '', '', '', '%sX.png' % OmniUtil.ICONS)
+	return feed
+
+"""
+.. py:function:: getPlaylistFeed(query)
+Get a channels recent upload feed.
+
+:param str query: Playlist URL
+:returns: Alfred 2 script filter feedback
+:rtype: XML Feedback
+"""
+def getPlaylistFeed(query):
+	feed = OmniUtil.Feedback()
+	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_PLAYLIST_FEED % OmniUtil.__urlParse__(query).query.split('=')[1])
 	if gdataResults:
 		for i in gdataResults:
 			feed.add_item(i['title']['$t'], '%s - %s' % (i['media$group']['media$credit'][0]['yt$display'], 
@@ -185,9 +247,9 @@ def getSubscriptions():
 				'http://www.youtube.com/channel/%s' % i['yt$channelId']['$t'], '', '', 
 				'%s%s.jpg' % (OmniUtil.SUBSCRIPTIONS, i['yt$channelId']['$t']))
 	else:
-		feed.add_item('No Results', 'No results for subscriptions could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
-	return feed
-	
+		feed.add_item('No Results', 'No results for your subscriptions could be found', '', '', '', '%sX.png' % OmniUtil.ICONS)
+	return feed	
+
 """
 .. py:function:: getProfile()
 List information about the authenticated user's profile.
@@ -215,22 +277,23 @@ def getProfile():
 		'', '', '%sGroupG.png' % OmniUtil.ICONS)
 	feed.add_item('Uploads %s' % i['gd$feedLink'][filterFeeds(i, 'http://gdata.youtube.com/schemas/2007#user.uploads')]['countHint'], 
 		'', '{\'key\':\'uploads\'}', '', '', '%sMulti.png' % OmniUtil.ICONS)
-	feed.add_item('Favorites %s' % OmniUtil.jsonLoad(OmniUtil.BASE_FAVORITES)['feed']['openSearch$totalResults']['$t'], 
-		'', '{\'key\':\'favorites\'}', '', '', '%sHeart.png' % OmniUtil.ICONS)
-	feed.add_item('Watch Later %s' % OmniUtil.jsonLoad(OmniUtil.BASE_WATCHLATER)['feed']['openSearch$totalResults']['$t'], 
-		'', '{\'key\':\'watchlater\'}', '', '', '%sClock.png' % OmniUtil.ICONS)
+	try:
+		feed.add_item('Playlists %s' % OmniUtil.jsonLoad(OmniUtil.BASE_USER_PLAYLIST)['feed']['openSearch$totalResults']['$t'],
+		'', '{\'key\':\'playlists\'}', '', '', '%sList.png' % OmniUtil.ICONS)
+	except ValueError:
+		feed.add_item(u'\uFFFD Playlists \uFFFD', 'Sorry, for some reason your playlists could not be found', '', '', '', '%sList.png' % OmniUtil.ICONS)
+	try:
+		feed.add_item('Favorites %s' % OmniUtil.jsonLoad(OmniUtil.BASE_FAVORITES)['feed']['openSearch$totalResults']['$t'], 
+			'', '{\'key\':\'favorites\'}', '', '', '%sHeart.png' % OmniUtil.ICONS)
+	except ValueError:
+		feed.add_item(u'\uFFFD Favorites \uFFFD', 'Sorry, for some reason your Favorites could not be found', '', '', '', '%sHeart.png' % OmniUtil.ICONS)
+	try:
+		feed.add_item('Watch Later %s' % OmniUtil.jsonLoad(OmniUtil.BASE_WATCHLATER)['feed']['openSearch$totalResults']['$t'], 
+			'', '{\'key\':\'watchlater\'}', '', '', '%sClock.png' % OmniUtil.ICONS)
+	except ValueError:
+		feed.add_item(u'\uFFFD Watch Later \uFFFD' 'Sorry, for some reason your Watch Later could not be found', '', '', '', '%sClock.png' % OmniUtil.ICONS)
 	return feed
 
-"""
-.. py:function:: clearHistory()
-Clear the recent viewing history of the authenticated user.
-"""
-def clearHistory():
-	requests.post('%s/watch_history/actions/clear' % OmniUtil.BASE_PROFILE,
-		data = '<?xml version="1.0" encoding="UTF-8"?>\n<entry xmlns="http://www.w3.org/2005/Atom">\n</entry>',
-		headers = OmniUtil.postLoad())
-	OmniUtil.displayNotification(OmniUtil.TITLE, 'History Cleared', '', '')
-	
 """
 .. py:function:: queryVideo(query)
 Search for a video on YouTube.
@@ -294,6 +357,68 @@ def queryPlaylist(query):
 	return feed
 
 """
+.. py:function:: addPlaylist()
+Add a new playlist to the authenticated user's profile.
+"""
+def addPlaylist():
+	playlistTitle = OmniUtil.cocoaInputBox('Enter the title of your new playlist:', '%s/icon.png' % OmniUtil.WORKFLOW)
+	playlistDescription = OmniUtil.cocoaInputBox('Enter a description for your new playlist:', '%s/icon.png' % OmniUtil.WORKFLOW)
+	postLoad = OmniUtil.postLoad()
+	postLoad['Content-Length'] = '1'
+	requests.post(OmniUtil.BASE_USER_PLAYLIST,
+		data = '<?xml version="1.0" encoding="UTF-8"?>\n<entry xmlns="http://www.w3.org/2005/Atom"\n\txmlns:yt="http://gdata.youtube.com/schemas/2007">\n<title type="text">%s</title>\n<summary>%s</summary>\n</entry>' % (playlistTitle, playlistDescription),
+		headers = postLoad)
+	OmniUtil.displayNotification(OmniUtil.TITLE, 'Created new playlist', playlistTitle, '')
+
+"""
+.. py:function:: removePlaylist(query)
+Remove a playlist from the authenticated user's profile.
+
+:param str query: URL of playlist to delete
+"""
+def removePlaylist(query):
+	playlistId = OmniUtil.__urlParse__(query).query.split('=')[1]
+	query = '%s/%s' % (OmniUtil.BASE_USER_PLAYLIST, playlistId)
+	if OmniUtil.cocoaYesNoBox('Deleting Playlist!', 'Are you sure you want to delete this playlist?', '%sWarning.png' % OmniUtil.ICONS):
+		requests.delete(query, data = '', headers = OmniUtil.postLoad())
+		OmniUtil.displayNotification(OmniUtil.TITLE, 'Deleted Playlist', playlistId, '')
+
+"""
+.. py:function:: addToPlaylist(video)
+Add a video to a specific playlist on the authenticated user's profile.
+
+:param str video: URL of the video to add
+"""
+def addToPlaylist(video):
+	if video[0] == "'":
+		video = video[1:-1]
+	postLoad = OmniUtil.postLoad()
+	postLoad['Content-Length'] = '1'
+	requests.post(OmniUtil.BASE_PLAYLIST_FEED % OmniUtil.__urlParse__(selectPlaylist('Add <%s> to which playlist?' % video)).query.split('=')[1],
+		data = '<?xml version="1.0" encoding="UTF-8"?>\n<entry xmlns="http://www.w3.org/2005/Atom"\n\txmlns:yt="http://gdata.youtube.com/schemas/2007">\n<id>%s</id>\n<yt:position>1</yt:position>\n</entry>' % OmniUtil.__urlParse__(video).query.split('=')[1].split('&')[0],
+		headers = postLoad)
+	OmniUtil.displayNotification(OmniUtil.TITLE, 'Added video to playlist', '', '')
+
+"""
+.. py:function:: removeFromPlaylist(video, playlist)
+Remove a video from a specific playlist on the authenticated user's profile.
+
+:param str video: URL of the video to remove
+:param str playlist: URL of the playlist to be removed from
+"""		
+def removeFromPlaylist(video):
+	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_PLAYLIST_FEED % OmniUtil.__urlParse__(selectPlaylist('Remove <%s> from which playlist?' % video)).query.split('=')[1])
+	if gdataResults:
+		for i in gdataResults:
+			if i['media$group']['yt$videoid']['$t'] == OmniUtil.__urlParse__(video).query.split('=')[1].split('&')[0]:
+				for j in i['link']:
+					if j['rel'] == 'self':
+						requests.delete(j['href'], data = '', headers = OmniUtil.postLoad())
+						OmniUtil.displayNotification(OmniUtil.TITLE, 'Removed video from playlist', '', '')
+	else:
+		OmniUtil.cocoaMsgBox('Could not delete video from playlist', 'Sorry, but an error occured during the deletion process.', '%sWarning.png' % OmniUtil.ICONS)
+
+"""
 .. py:function:: addFavorite(query)
 Add a video to the authenticated user's favorites.
 
@@ -305,14 +430,14 @@ def addFavorite(query):
 	requests.post(OmniUtil.BASE_FAVORITES, 
 		data = '<?xml version="1.0" encoding="UTF-8"?>\n<entry xmlns="http://www.w3.org/2005/Atom">\n<id>%s</id>\n</entry>' % query,
 		headers = OmniUtil.postLoad())
-	OmniUtil.displayNotification(OmniUtil.TITLE, 'Added to favorites', '', '')	
+	OmniUtil.displayNotification(OmniUtil.TITLE, 'Added to Favorites', '', '')	
 	
 """
 .. py:function:: removeFavorite(query)
 Remove a video from the authenticated user's favorites.
 
 :param str query: Video URL to be removed from favorites
-"""	
+"""
 def removeFavorite(query):
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_FAVORITES)
 	if gdataResults:
@@ -353,4 +478,4 @@ def removeWatchLater(query):
 		requests.delete('%s/%s' % (OmniUtil.BASE_FAVORITES, query), data = '', headers = OmniUtil.postLoad())
 		OmniUtil.displayNotification(OmniUtil.TITLE, 'Removed from Watch Later', '', '')
 	else:
-		OmniUtil.displayNotification(OmniUtil.TITLE, 'Could not remove from Watch Later', '<unkown error occured>', '')
+		OmniUtil.displayNotification(OmniUtil.TITLE, 'Could not remove from "Watch Later"', '<unkown error occured>', '')

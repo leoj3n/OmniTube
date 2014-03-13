@@ -19,9 +19,9 @@
 # You should have received a copy of the GNU General Public License
 # along with OmniTube. If not, see <http://www.gnu.org/licenses/>.
 
-import os, ast, json, subprocess, base64
+import os, sys, ast, json, subprocess, base64
 import plistlib, shutil, tempfile
-import urllib, urlparse, webbrowser
+import urllib, urlparse, webbrowser, requests
 import xml.etree.ElementTree as etree
 
 """
@@ -64,16 +64,19 @@ def __formatSpaces__(string):
 	return string.replace(' ', '\ ')
 
 TITLE         = 'OmniTube'
-VERSION       = 1.1
+VERSION       = 3.8
 WORKFLOW      = os.path.dirname(os.path.abspath(__file__))
-NOTIFIER      = __formatSpaces__('%s/Resources/Notifier.app/Contents/MacOS/terminal-notifier' % WORKFLOW)
+THEMEANALYTICS = __formatSpaces__('%s/co.nf.ritashugisha.Alfred2ThemeAnalytics' % WORKFLOW)
+GLYPHSETUP     = __formatSpaces__('%s/GlyphSetup' % WORKFLOW)
+NOTIFIER       = __formatSpaces__('%s/Resources/Notifier.app/Contents/MacOS/terminal-notifier' % WORKFLOW)
+COCOA          = __formatSpaces__('%s/Resources/cocoaDialog.app/Contents/MacOS/cocoaDialog' % WORKFLOW)
 ICONS	 	  = '%s/Resources/Icons/' % WORKFLOW
 SUBSCRIPTIONS = '%s/Resources/Subscriptions/' % WORKFLOW
 OAUTH_JSON    = '%s/Resources/oAuth.json' % WORKFLOW
 DEVELOPER_KEY = 'QUkzOXNpN3RFWGM3dXVYbWNEU255a2pkdWxjOXotY3Q2cC11REdWYURnM0U0MXZwdXRTM1pnSk85WGdUb2JTU3lvWHhiQlVJajBQNXEwaG43bUlkYko1VDFkRWpKR0tIeXc='
 CLIENT_ID     = 'NDk0NDY3MDg2NjMxLTZ0cDRrbjk4dGZoNXI5NnAyYTFkNmNlNXUzNm10N2hyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t'
 CLIENT_SECRET = 'WDNlc3VqVklwWDVsc3pOdVpuMjcxUmoz'
-INTRO_HTML    = 'file:///%s/OAuthHTML/index.html' % WORKFLOW
+INTRO_HTML    = 'http://www.ritashugisha.co.nf/OmniTube/index.html'
 SETTINGS      = '%s/Resources/Settings/' % WORKFLOW
 DEFAULT_BROWSER = '%s/defaultBrowser' % SETTINGS
 BASE_1        	   = 'https://accounts.google.com/o/oauth2'
@@ -89,6 +92,8 @@ BASE_FEED          = '%s/users/default/newsubscriptionvideos' % BASE_2
 BASE_HISTORY       = '%s/users/default/watch_history' % BASE_2
 BASE_VIDEO         = '%s/videos' % BASE_2
 BASE_CHANNEL       = '%s/channels' % BASE_2
+BASE_USER_PLAYLIST = '%s/users/default/playlists' % BASE_2
+BASE_PLAYLIST_FEED = '%s/playlists/%s' % (BASE_2, '%s')
 BASE_PLAYLIST      = '%s/playlists/snippets' % BASE_2
 BASE_POPULAR       = '%s/standardfeeds/most_popular' % BASE_2
 BASE_FAVORITES     = '%s/users/default/favorites' % BASE_2
@@ -143,23 +148,60 @@ def displayNotification(title, subtitle, message, execute):
 	__runProcess__(notifyCmd)
 
 """
-.. py:function:: displayDialog(title, message, buttons, defaultButton, icon)
-Display an applescript dialog box.
+.. py:function:: cocoaMsgBox(text, informative_text, icon)
+Display a message alert using cocoaDialog.
 
-:param str title: Title of dialog
-:param str message: Message of dialog
-:param array buttons: Array of button names (str)
-:param str defaultButton: Name of default button
-:param int/str icon: String or int of icon
+:param str text: Bold text of message box
+:param str informative_text: Secondary text of message box
+:param str icon: Path to icon file
 """
-def displayDialog(title, message, buttons, defaultButton, icon):
-	buttons = '{"%s"}' % '", "'.join(buttons)
-	dialogCmd = 'display dialog "%s" with title "%s" buttons %s default button "%s"' % (message, title, buttons, defaultButton)
-	if isinstance(icon, int):
-		dialogCmd = '%s with icon %s' % (dialogCmd, icon)
+def cocoaMsgBox(text, informative_text, icon):
+	displayCmd = '%s ok-msgbox --title "%s" --text "%s" --informative-text "%s" --icon-file "%s"' % (COCOA, TITLE, text, informative_text, icon)
+	return __runProcess__(displayCmd).split('\n')[0] == '1'
+
+"""
+.. py:function:: cocoaYesNoBox(text, informative_text, icon)
+Display a yes/no box using cocoaDialog.
+
+:param str text: Bold text of message box
+:param str informative_text: Secondary text of message box
+:param str icon: Path to icon file
+"""
+def cocoaYesNoBox(text, informative_text, icon):
+	displayCmd = '%s msgbox --title "%s" --text "%s" --informative-text "%s" --button1 "Yes" --button2 "No" --icon-file "%s"' % (COCOA, TITLE, text, informative_text, icon)
+	return __runProcess__(displayCmd).split('\n')[0] == '1'
+
+"""
+.. py:function:: cocoaInputBox(text, icon)
+Display a simple input box using cocoaDialog.
+
+:param str text: Bold text of message box
+:param str icon: Path to icon file
+"""
+def cocoaInputBox(text, icon):
+	displayCmd = '%s standard-inputbox --title "%s" --informative-text "%s" --icon-file "%s"' % (COCOA, TITLE, text, icon)
+	execDisplayCmd = __runProcess__(displayCmd)
+	if execDisplayCmd.split('\n')[0] == '1':
+		return execDisplayCmd.split('\n')[1]
 	else:
-		dialogCmd = '%s with icon "%s"' % (dialogCmd, icon)
-	__runProcess__('osascript -e \'%s\'' % dialogCmd)
+		sys.exit(0)
+		
+"""
+.. py:function:: cocoaDropdown(text, items, icon)
+Display a simple dropdown dialog using cocoaDialog.
+
+:param str text: Informative text of dialog
+:param list items: Array of items
+:param str icon: Path to icon file
+"""
+def cocoaDropdown(text, items, icon):
+	items = '" "'.join(items)
+	displayCmd = '%s dropdown --title "%s" --text "%s" --button1 "Ok" --button2 "Cancel" --items "%s" --icon-file "%s" --string-output' % (COCOA, TITLE, text, items, icon)
+	execDisplayCmd = __runProcess__(displayCmd)
+	if execDisplayCmd.split('\n')[0] == 'Ok':
+		return execDisplayCmd.split('\n')[1]
+	else:
+		sys.exit(0)
 
 """
 .. py:function:: jsonLoad(baseUrl)
@@ -228,7 +270,11 @@ Retrieve a channel's thumbnail image and save it to subscriptions folder.
 :param str userID: Channel ID to retrieve
 """
 def retrieveThumb(userID):
-	urllib.urlretrieve(gdataLoad(BASE_USER % userID, tag1 = '', tag2 = '')['entry']['media$thumbnail']['url'], '%s%s.jpg' % (SUBSCRIPTIONS, userID))		
+	try:
+		urllib.urlretrieve(gdataLoad(BASE_USER % userID, tag1 = '', 
+			tag2 = '')['entry']['media$thumbnail']['url'], '%s%s.jpg' % (SUBSCRIPTIONS, userID))
+	except ValueError:
+		pass		
 		
 """
 .. py:function:: introHtmlOpen()
@@ -244,7 +290,7 @@ def introHtmlOpen():
 		defaultBrowser = 'Google Chrome'
 	else:
 		defaultBrowser = 'Safari'
-	__runProcess__('osascript -e \'tell application "%s" to open location "%s"\'' % (defaultBrowser, urllib.quote(INTRO_HTML).replace('%3A', ':')))
+	__runProcess__('osascript -e \'tell application "%s" to open location "%s"\'' % (defaultBrowser, INTRO_HTML))
 	__runProcess__('osascript -e \'tell application "System Events" to set frontmost of process "%s" to true\'' % defaultBrowser)
 	
 """
@@ -298,11 +344,27 @@ def postLoad():
 
 """
 .. py:function:: clearHistory()
-Call to OmniTube.clearHistory().
+Clear the recent viewing history of the authenticated user.
 """
 def clearHistory():
-	import OmniTube
-	OmniTube.clearHistory()
+	requests.post('%s/watch_history/actions/clear' % BASE_PROFILE,
+		data = '<?xml version="1.0" encoding="UTF-8"?>\n<entry xmlns="http://www.w3.org/2005/Atom">\n</entry>',
+		headers = postLoad())
+	displayNotification(TITLE, 'History Cleared', '', '')
+
+"""
+.. py:function:: addPlaylist()
+Add a new playlist to the authenticated user's profile.
+"""
+def addPlaylist():
+	playlistTitle = cocoaInputBox('Enter the title of your new playlist:', '%s/icon.png' % WORKFLOW)
+	playlistDescription = cocoaInputBox('Enter a description for your new playlist:', '%s/icon.png' % WORKFLOW)
+	newpostLoad = postLoad()
+	newpostLoad['Content-Length'] = '1'
+	requests.post(BASE_USER_PLAYLIST,
+		data = '<?xml version="1.0" encoding="UTF-8"?>\n<entry xmlns="http://www.w3.org/2005/Atom"\n\txmlns:yt="http://gdata.youtube.com/schemas/2007">\n<title type="text">%s</title>\n<summary>%s</summary>\n</entry>' % (playlistTitle, playlistDescription),
+		headers = newpostLoad)
+	displayNotification(TITLE, 'Created new playlist', playlistTitle, '')
 
 """
 .. py:function:: priorityOutput(query)
@@ -311,10 +373,16 @@ Final handler for script filter arguments
 :param str query: String dictionary to be parsed
 """
 def priorityOutput(query):
+	if query[0] == '"' and query[-1] == '"':
+		query = query[1:-1]
 	try:
 		query = ast.literal_eval(query)
 		if query['key'] == 'wipehistory':
 			clearHistory()
+		elif query['key'] == 'newplaylist':
+			addPlaylist()
+		elif query['key'] == 'playlists':
+			__searchAlfred__('► playlists')
 		elif query['key'] == 'favorites':
 			__searchAlfred__('► favorites')
 		elif query['key'] == 'watchlater':
@@ -327,7 +395,7 @@ def priorityOutput(query):
 			webbrowser.open(query)
 	except:
 		webbrowser.open(query)
-	
+
 """
 .. py:function:: validStart()
 Makes sure that the user is authorized, has a valid token, and required files exist before running.
@@ -336,10 +404,6 @@ def validStart():
 	import OmniAuth
 	if not os.path.exists('%s/Resources/' % WORKFLOW):
 		__runProcess__('mkdir %s' % __formatSpaces__('%s/Resources/' % WORKFLOW))
-	#if not os.path.exists('%s/Resources/Settings' % WORKFLOW):
-	#	__runProcess__('mkdir %s' % __formatSpaces__('%s/Resources/Settings' % WORKFLOW))
-	#if not os.path.exists('%s/Resources/Settings/defaultBrowser' % WORKFLOW):
-	#	__runProcess__('touch %s' % '%s/Resources/Settings/defaultBrowser' % WORKFLOW)
 	if not os.path.exists(ICONS):
 		__runProcess__('mkdir %s' % __formatSpaces__(ICONS))
 	if not os.path.exists(SUBSCRIPTIONS):
@@ -348,4 +412,5 @@ def validStart():
 		__runProcess__('touch %s' % __formatSpaces__(OAUTH_JSON))
 	OmniAuth.validStart()	
 
+__runProcess__('%s --light light --dark dark --executable %s' % (GLYPHSETUP, THEMEANALYTICS))
 validStart()	
