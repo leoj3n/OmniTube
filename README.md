@@ -62,10 +62,9 @@ _Note: All dependencies are installed and configured with default package. **Pyt
 ######Theme Optimization
 This package now contains theme optimization. This allows OmniTube to analyze the current user's theme and change between white and black icons. 
 
-Theme optimization requires two dependencies.
+Theme optimization has this one dependency.
 
-1.	co.nf.ritashugisha.Alfred2ThemeAnalytics - _Ritashugisha (thanks to [Clinton Strong](http://www.alfredforum.com/user/163-clinton-strong/))_
-2.	GlyphSetup - _Ritashugisha_
+>[GlyphSetup](https://github.com/Ritashugisha/GlyphSetup)
 
 _No more having to download **either** a white or black themed workflow_.
 
