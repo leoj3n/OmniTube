@@ -66,7 +66,6 @@ def __formatSpaces__(string):
 TITLE         = 'OmniTube'
 VERSION       = 3.8
 WORKFLOW      = os.path.dirname(os.path.abspath(__file__))
-THEMEANALYTICS = __formatSpaces__('%s/co.nf.ritashugisha.Alfred2ThemeAnalytics' % WORKFLOW)
 GLYPHSETUP     = __formatSpaces__('%s/GlyphSetup' % WORKFLOW)
 NOTIFIER       = __formatSpaces__('%s/Resources/Notifier.app/Contents/MacOS/terminal-notifier' % WORKFLOW)
 COCOA          = __formatSpaces__('%s/Resources/cocoaDialog.app/Contents/MacOS/cocoaDialog' % WORKFLOW)
@@ -412,5 +411,5 @@ def validStart():
 		__runProcess__('touch %s' % __formatSpaces__(OAUTH_JSON))
 	OmniAuth.validStart()	
 
-__runProcess__('%s --light light --dark dark --executable %s' % (GLYPHSETUP, THEMEANALYTICS))
+__runProcess__('%s -light -light -dark -dark' % GLYPHSETUP)
 validStart()	
