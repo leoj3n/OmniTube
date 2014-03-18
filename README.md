@@ -1,14 +1,18 @@
 #OmniTube<sub>_(alpha)_</sub>
---
+
+---
+
 ###Alfred ⇄ YouTube account automation
 _This workflow allows you to view your profile, view your subscription feed, edit or create new playlists, and search YouTube from Alfred._
+
 ######Script Filters
 The script filters in __OmniTube__ include:
-+	__YouFeed__ lists all of your subscription's recent uploads.
-+	__YouProfile__ shows basic information about your account and gives you access to your playlists.
-+	__YouPopular__ lists the most popular videos of today.
-+	__YouHistory__ shows your recent viewing history.
-+	__YouVideo__, __YouChannel__, and __YouPlaylist__ allows you to search all of YouTube.
+
+1.	__YouFeed__ lists all of your subscription's recent uploads.
+2.	__YouProfile__ shows basic information about your account and gives you access to your playlists.
+3.	__YouPopular__ lists the most popular videos of today.
+4.	__YouHistory__ shows your recent viewing history.
+5.	__YouVideo__, __YouChannel__, and __YouPlaylist__ allows you to search all of YouTube.
 
 By using the keyword __you__ in Alfred the following results appear.
 
@@ -32,11 +36,12 @@ By using the __YouHistory__ option, you can either view your recent video views 
 
 ######Action Modifiers
 There are many default action modifiers within __OmniTube__.
-+	__CTRL__ will usually allow you to add or remove a video to or from your _Watch Later_ playlist.
-+	__ALT__ will usually allow you to add or remove a video to or from your _Favorites_ playlist.
-+	__CMD__ will give you downloading options according to the highlighted selection.
-+	__FN__ will copy the URL of the highlighted selection.
-+	__SHIFT__ will allow you to save the video to a specific playlist on your account.
+
+1.	__CTRL__ will usually allow you to add or remove a video to or from your _Watch Later_ playlist.
+2.	__ALT__ will usually allow you to add or remove a video to or from your _Favorites_ playlist.
+3.	__CMD__ will give you downloading options according to the highlighted selection.
+4.	__FN__ will copy the URL of the highlighted selection.
+5.	__SHIFT__ will allow you to save the video to a specific playlist on your account.
 
 --
 ###Package Information
@@ -68,7 +73,10 @@ Theme optimization has this one dependency.
 
 _No more having to download **either** a white or black themed workflow_.
 
---
+---
+
 &copy; 2014 Ritashugisha. 
 
-[![Facebook](http://files.softicons.com/download/social-media-icons/clean-simple-social-icons-by-creative-nerds/png/32x32/Facebook.png "Facebook")](https://www.facebook.com/stephen.bunn.73)	[![Twitter](http://png-3.findicons.com/files/icons/2573/new_social_media_icons_set/32/twitter.png "Twitter")](https://twitter.com/ritashugisha)	[![Github](http://gamebuilderstudio.com/img/design/github-icon.png "GitHub")](https://github.com/Ritashugisha)	[![MailTo](http://i1293.photobucket.com/albums/b599/Ritashugisha/new_zps0e48276f.png "MailTo")](ritashugisha@gmail.com)	[![AlfredApp Profile](http://i1293.photobucket.com/albums/b599/Ritashugisha/UntitledNew_zpsfb3ea780.png "AlfredApp Profile")](http://www.alfredforum.com/user/5520-ritashugisha/)	[![Packal Profile](http://i1293.photobucket.com/albums/b599/Ritashugisha/UntitledNew_zpsc2cb05a9.png "Packal Profile")](http://www.packal.org/users/ritashugisha)	[![Personal Website](http://i1293.photobucket.com/albums/b599/Ritashugisha/UntitledNew_zps88305ee4.gif "Personal Website")](http://www.ritashugisha.co.nf/)
+[![Facebook](http://i1293.photobucket.com/albums/b599/Ritashugisha/Facebook_zps584eea28.png "Facebook")](https://www.facebook.com/stephen.bunn.73)	[![Twitter](http://i1293.photobucket.com/albums/b599/Ritashugisha/Twitter_zps816ca1c8.png "Twitter")](https://twitter.com/ritashugisha)	[![Github](http://i1293.photobucket.com/albums/b599/Ritashugisha/Github_zpse2e092df.png "GitHub")](https://github.com/Ritashugisha)	[![MailTo](http://i1293.photobucket.com/albums/b599/Ritashugisha/new_zps0e48276f.png "MailTo")](ritashugisha@gmail.com)	[![AlfredApp Profile](http://i1293.photobucket.com/albums/b599/Ritashugisha/UntitledNew_zpsfb3ea780.png "AlfredApp Profile")](http://www.alfredforum.com/user/5520-ritashugisha/)	[![Packal Profile](http://i1293.photobucket.com/albums/b599/Ritashugisha/UntitledNew_zpsc2cb05a9.png "Packal Profile")](http://www.packal.org/users/ritashugisha)	[![Personal Website](http://i1293.photobucket.com/albums/b599/Ritashugisha/UntitledNew_zps88305ee4.gif "Personal Website")](http://www.ritashugisha.co.nf/)
+
+---
