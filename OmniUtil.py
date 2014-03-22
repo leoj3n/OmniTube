@@ -23,6 +23,7 @@ import os, sys, ast, json, subprocess, base64
 import plistlib, shutil, tempfile
 import urllib, urlparse, webbrowser, requests
 import xml.etree.ElementTree as etree
+import OmniAuth
 
 """
 .. py:class:: Feedback()
@@ -64,20 +65,25 @@ def __formatSpaces__(string):
 	return string.replace(' ', '\ ')
 
 TITLE         = 'OmniTube'
-VERSION       = 3.8
+VERSION       = 4.2
 WORKFLOW      = os.path.dirname(os.path.abspath(__file__))
-GLYPHSETUP     = __formatSpaces__('%s/GlyphSetup' % WORKFLOW)
-NOTIFIER       = __formatSpaces__('%s/Resources/Notifier.app/Contents/MacOS/terminal-notifier' % WORKFLOW)
-COCOA          = __formatSpaces__('%s/Resources/cocoaDialog.app/Contents/MacOS/cocoaDialog' % WORKFLOW)
-ICONS	 	  = '%s/Resources/Icons/' % WORKFLOW
-SUBSCRIPTIONS = '%s/Resources/Subscriptions/' % WORKFLOW
-OAUTH_JSON    = '%s/Resources/oAuth.json' % WORKFLOW
+RESOURCES     = '%s/Resources' % WORKFLOW
+GLYPHSETUP    = __formatSpaces__('%s/GlyphSetup' % WORKFLOW)
+NOTIFIER      = '/Applications/terminal-notifier.app/Contents/MacOS/terminal-notifier'
+COCOA         = '/Applications/cocoaDialog.app/Contents/MacOS/cocoaDialog'
+ICONS	 	  = '%s/Icons/' % RESOURCES
+PKG_MANAGER   = __formatSpaces__('%s/PackageManager' % WORKFLOW)
+DEPENDENCIES  = [{'title':'terminal-notifier', 'dest':'/Applications'}, 
+	{'title':'chromedriver', 'dest':'%s/webdrivers' % __formatSpaces__(RESOURCES)},
+	{'title':'cocoadialog', 'dest':'/Applications'}, 
+	{'title':'glyphsetup', 'dest':__formatSpaces__(WORKFLOW)},
+	{'title':'omnitubeicons', 'dest':__formatSpaces__(RESOURCES)}]
+SUBSCRIPTIONS = '%s/Subscriptions/' % RESOURCES
+OAUTH_JSON    = '%s/oAuth.json' % RESOURCES
 DEVELOPER_KEY = 'QUkzOXNpN3RFWGM3dXVYbWNEU255a2pkdWxjOXotY3Q2cC11REdWYURnM0U0MXZwdXRTM1pnSk85WGdUb2JTU3lvWHhiQlVJajBQNXEwaG43bUlkYko1VDFkRWpKR0tIeXc='
 CLIENT_ID     = 'NDk0NDY3MDg2NjMxLTZ0cDRrbjk4dGZoNXI5NnAyYTFkNmNlNXUzNm10N2hyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t'
 CLIENT_SECRET = 'WDNlc3VqVklwWDVsc3pOdVpuMjcxUmoz'
 INTRO_HTML    = 'http://www.ritashugisha.co.nf/OmniTube/index.html'
-SETTINGS      = '%s/Resources/Settings/' % WORKFLOW
-DEFAULT_BROWSER = '%s/defaultBrowser' % SETTINGS
 BASE_1        	   = 'https://accounts.google.com/o/oauth2'
 BASE_2        	   = 'https://gdata.youtube.com/feeds/api'
 BASE_OAUTH         = '%s/auth' % BASE_1
@@ -252,14 +258,18 @@ Retrieve the system's default web browser's name.
 :rtype: str
 """
 def getDefaultBrowser():
-	tempLaunchServices = tempfile.mkstemp(suffix = '.plist', dir = os.path.expanduser('/tmp/'))[1]
-	shutil.copy('%s/Library/Preferences/com.apple.LaunchServices.plist' % os.path.expanduser('~'), tempLaunchServices)
-	subprocess.call(['plutil', '-convert', 'xml1', tempLaunchServices])
-	for i in plistlib.readPlist(tempLaunchServices)['LSHandlers']:
-		if 'LSHandlerURLScheme' in i and 'http' in i['LSHandlerURLScheme']:
-			defaultBrowser = i['LSHandlerRoleAll']
-			break
-	__runProcess__('rm -rf %s' % tempLaunchServices)
+	defaultBrowser = ''
+	try:
+		tempLaunchServices = tempfile.mkstemp(suffix = '.plist', dir = os.path.expanduser('/tmp/'))[1]
+		shutil.copy('%s/Library/Preferences/com.apple.LaunchServices.plist' % os.path.expanduser('~'), tempLaunchServices)
+		subprocess.call(['plutil', '-convert', 'xml1', tempLaunchServices])
+		for i in plistlib.readPlist(tempLaunchServices)['LSHandlers']:
+			if 'LSHandlerURLScheme' in i and 'http' in i['LSHandlerURLScheme']:
+				defaultBrowser = i['LSHandlerRoleAll']
+				break
+		__runProcess__('rm -rf %s' % tempLaunchServices)
+	except:
+		defaultBrowser = 'com.apple.safari'
 	return defaultBrowser
 
 """
@@ -400,16 +410,29 @@ def priorityOutput(query):
 Makes sure that the user is authorized, has a valid token, and required files exist before running.
 """	
 def validStart():
-	import OmniAuth
-	if not os.path.exists('%s/Resources/' % WORKFLOW):
-		__runProcess__('mkdir %s' % __formatSpaces__('%s/Resources/' % WORKFLOW))
-	if not os.path.exists(ICONS):
-		__runProcess__('mkdir %s' % __formatSpaces__(ICONS))
-	if not os.path.exists(SUBSCRIPTIONS):
-		__runProcess__('mkdir %s' % __formatSpaces__(SUBSCRIPTIONS))
+	if not os.path.exists(RESOURCES):
+		__runProcess__('mkdir %s' % __formatSpaces__(RESOURCES))
 	if not os.path.exists(OAUTH_JSON):
 		__runProcess__('touch %s' % __formatSpaces__(OAUTH_JSON))
+	if not os.path.exists('%s/webdrivers' % RESOURCES):
+		__runProcess__('mkdir %s' % __formatSpaces__('%s/webdrivers' % RESOURCES))
+	if not os.path.exists(SUBSCRIPTIONS):
+		__runProcess__('mkdir %s' % __formatSpaces__(SUBSCRIPTIONS))
+	requiredInstalls = []
+	for i in DEPENDENCIES:
+		if not 'True' in __runProcess__('%s --is-installed %s %s' % (PKG_MANAGER, 
+			i['title'], i['dest'])).split('\n')[0]:
+			requiredInstalls.append(i)
+	if len(requiredInstalls) > 0:
+		newDependencies = ''
+		newDestinations = ''
+		for i in requiredInstalls:
+			newDependencies = '%s %s' % (newDependencies, i['title'])
+			newDestinations = '%s %s' % (newDestinations, i['dest'])
+		__runProcess__('%s -i%s -o%s' % (PKG_MANAGER, newDependencies, newDestinations))
+	__runProcess__('%s -light -light -dark -dark' % GLYPHSETUP)
+	import OmniAuth
 	OmniAuth.validStart()	
 
-__runProcess__('%s -light -light -dark -dark' % GLYPHSETUP)
-validStart()	
+if __name__ in '__main__':
+	validStart()	

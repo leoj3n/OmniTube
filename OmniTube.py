@@ -30,6 +30,7 @@ Get the authenticated user's subscription's upload feed.
 :rtype: XML Feedback
 """
 def getFeed():
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_FEED)
 	if gdataResults:
@@ -52,6 +53,7 @@ Get the authenticated user's viewing history.
 :rtype: XML Feedback
 """	
 def getHistory():
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_HISTORY)
 	if gdataResults:
@@ -74,6 +76,7 @@ Select a playlist from the authenticated user's profile.
 :rtype: str
 """
 def selectPlaylist(text):
+	OmniUtil.validStart()
 	playlistHref = {}
 	items = []
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_USER_PLAYLIST)
@@ -95,6 +98,7 @@ Get the authenticated user's playlists.
 :rtype: XML Feedback
 """
 def getPlaylists():
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_USER_PLAYLIST)
 	feed.add_item(u'\u2329 New Playlist \u232A', '', "{'key':'newplaylist'}", '', '', '%sAddList.png' % OmniUtil.ICONS)
@@ -114,6 +118,7 @@ Get today's most popular YouTube videos.
 :rtype: XML Feedback
 """
 def getPopular():
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_POPULAR, param1 = {'time':'today'})
 	if gdataResults:
@@ -134,6 +139,7 @@ Get authenticated user's favorites list.
 :rtype: XML Feedback
 """
 def getFavorites():
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_FAVORITES)
 	if gdataResults:
@@ -174,6 +180,7 @@ Get authenticated user's uploads list.
 :rtype: XML Feedback
 """
 def getUploads():
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_UPLOADS)
 	if gdataResults:
@@ -195,6 +202,7 @@ Get a channels recent upload feed.
 :rtype: XML Feedback
 """
 def getChannelFeed(query):
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_USER_UPLOADS % OmniUtil.__urlParse__(query).path.split('/')[-1], 
 		param1 = {'orderby':'published'})
@@ -217,6 +225,7 @@ Get a channels recent upload feed.
 :rtype: XML Feedback
 """
 def getPlaylistFeed(query):
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_PLAYLIST_FEED % OmniUtil.__urlParse__(query).query.split('=')[1])
 	if gdataResults:
@@ -237,6 +246,7 @@ List some of the authenticated user's subscriptions.
 :rtype: XML Feedback
 """
 def getSubscriptions():
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_SUBSCRIPTIONS)
 	if gdataResults:
@@ -258,6 +268,7 @@ List information about the authenticated user's profile.
 :rtype: XML Feedback
 """
 def getProfile():
+	OmniUtil.validStart()
 	def filterFeeds(gdataResults, rel):
 		count = 0
 		for i in gdataResults['gd$feedLink']:
@@ -303,6 +314,7 @@ Search for a video on YouTube.
 :rtype: XML Feedback
 """	
 def queryVideo(query):
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_VIDEO, param1 = {'orderby':'relevance', 'q':query})
 	if gdataResults:
@@ -324,6 +336,7 @@ Search for a channel on YouTube.
 :rtype: XML Feedback
 """
 def queryChannel(query):
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_CHANNEL, param1 = {'max-results':'9', 'q':query})
 	if gdataResults:
@@ -346,6 +359,7 @@ Search for a playlist on YouTube.
 :rtype: XML Feedback
 """
 def queryPlaylist(query):
+	OmniUtil.validStart()
 	feed = OmniUtil.Feedback()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_PLAYLIST, param1 = {'max-results':'9', 'q':query})
 	if gdataResults:
@@ -361,6 +375,7 @@ def queryPlaylist(query):
 Add a new playlist to the authenticated user's profile.
 """
 def addPlaylist():
+	OmniUtil.validStart()
 	playlistTitle = OmniUtil.cocoaInputBox('Enter the title of your new playlist:', '%s/icon.png' % OmniUtil.WORKFLOW)
 	playlistDescription = OmniUtil.cocoaInputBox('Enter a description for your new playlist:', '%s/icon.png' % OmniUtil.WORKFLOW)
 	postLoad = OmniUtil.postLoad()
@@ -377,6 +392,7 @@ Remove a playlist from the authenticated user's profile.
 :param str query: URL of playlist to delete
 """
 def removePlaylist(query):
+	OmniUtil.validStart()
 	playlistId = OmniUtil.__urlParse__(query).query.split('=')[1]
 	query = '%s/%s' % (OmniUtil.BASE_USER_PLAYLIST, playlistId)
 	if OmniUtil.cocoaYesNoBox('Deleting Playlist!', 'Are you sure you want to delete this playlist?', '%sWarning.png' % OmniUtil.ICONS):
@@ -390,6 +406,7 @@ Add a video to a specific playlist on the authenticated user's profile.
 :param str video: URL of the video to add
 """
 def addToPlaylist(video):
+	OmniUtil.validStart()
 	if video[0] == "'":
 		video = video[1:-1]
 	postLoad = OmniUtil.postLoad()
@@ -407,6 +424,7 @@ Remove a video from a specific playlist on the authenticated user's profile.
 :param str playlist: URL of the playlist to be removed from
 """		
 def removeFromPlaylist(video):
+	OmniUtil.validStart()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_PLAYLIST_FEED % OmniUtil.__urlParse__(selectPlaylist('Remove <%s> from which playlist?' % video)).query.split('=')[1])
 	if gdataResults:
 		for i in gdataResults:
@@ -425,6 +443,7 @@ Add a video to the authenticated user's favorites.
 :param str query: Video URL to be added to favorites
 """
 def addFavorite(query):
+	OmniUtil.validStart()
 	query = OmniUtil.__urlParse__(query).query.split('v=')[-1].split('&')[0]
 	OmniUtil.postLoad()['Content-Length'] = '1'
 	requests.post(OmniUtil.BASE_FAVORITES, 
@@ -439,6 +458,7 @@ Remove a video from the authenticated user's favorites.
 :param str query: Video URL to be removed from favorites
 """
 def removeFavorite(query):
+	OmniUtil.validStart()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_FAVORITES)
 	if gdataResults:
 		for i in gdataResults:
@@ -456,6 +476,7 @@ Add a video to the authenticated user's watch later playlist.
 :param str query: Video URL to be added to watch later
 """		
 def addWatchLater(query):
+	OmniUtil.validStart()
 	query = OmniUtil.__urlParse__(query).query.split('v=')[-1].split('&')[0]
 	OmniUtil.postLoad()['Content-Length'] = '1'
 	requests.post(OmniUtil.BASE_WATCHLATER,
@@ -470,6 +491,7 @@ Remove a video from the authenticated user's watch later playlist.
 :param str query: Video URL to be removed from watch later
 """	
 def removeWatchLater(query):
+	OmniUtil.validStart()
 	gdataResults = OmniUtil.gdataLoad(OmniUtil.BASE_WATCHLATER)
 	if gdataResults:
 		for i in gdataResults:

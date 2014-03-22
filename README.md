@@ -61,6 +61,7 @@ __OmniTube__ is currently licensed under the [GNU GPLv3 Free Software License](h
 2.	[Selenium](http://selenium-python.readthedocs.org/) 2.40.0+
 3.	[Splinter](http://splinter.cobrateam.info/) 0.6.0+
 4.	[CocoaDialog](http://mstratman.github.io/cocoadialog/) 3.0.0-beta7
+5.  [terminal-notifier](https://github.com/alloy/terminal-notifier) 1.5.1
 
 _Note: All dependencies are installed and configured with default package. **Python2.7+** is required to run all dependencies_.
 
