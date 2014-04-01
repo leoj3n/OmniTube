@@ -4,34 +4,28 @@
 # @author  Ritashugisha
 # @contact ritashugisha@gmail.com
 #
-# This file is part of PackageManager.
+# This file is part of LuxePrisimPackageManager.
 #
-# PackageManager is free software: you can redistribute it and/or modify
+# LuxePrisimPackageManager is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# PackageManager is distributed in the hope that it will be useful,
+# LuxePrisimPackageManager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with PackageManager. If not, see <http://www.gnu.org/licenses/>.
+# along with LuxePrisimPackageManager. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-.. module:: PackageManager
-	:platform: OSX
-	:synopsis: Alfred workflow useful executable repository manager.
-
-.. moduleauthor:: Ritashugisha <ritashugisha@gmail.com>
-"""
 import os, sys, subprocess
-import inspect, StringIO
-import json, urllib, tempfile
-import argparse, traceback
+import inspect, tempfile
+import urllib, json, traceback
+import argparse
 
-MAIN_JSON = 'https://raw.github.com/Ritashugisha/AlfredWorkflowResourcePack/master/main.json'
+MAIN = 'https://github.com/Ritashugisha/luxeprisim.dependency.pack/raw/master/Packages'
+JSON = 'https://raw.github.com/Ritashugisha/luxeprisim.dependency.pack/master/main.json'
 
 """
 .. py:function:: __runProcess__(procCmd)
@@ -80,7 +74,7 @@ def onVerbose(message, display):
 		header = '%s<%s@%s>' % (os.path.basename(__file__), info.function, info.lineno)
 		sys.stdout.write('%s%s%s\n' % (header, ' ' * (40 - len(header)), message))
 
-
+		
 """
 .. py:class:: PackageManager()
 Alfred workflow resource dependency package manager.
@@ -97,12 +91,15 @@ class PackageManager():
 	def __init__(self, requiredDependencies = [], verbose = False):
 		self.requiredDependencies = requiredDependencies
 		self.verbose   = verbose
-		onVerbose('reading JSON from <%s>' % MAIN_JSON, self.verbose)
-		self.jsonRead  = json.loads(urllib.urlopen(MAIN_JSON).read())
+		onVerbose('reading JSON from <%s>' % JSON, self.verbose)
+		try:
+			self.jsonRead  = json.loads(urllib.urlopen(JSON).read())
+		except ValueError:
+			onError('MissingJson', JSON)
 		self.author    = self.jsonRead['author']
 		self.contact   = self.jsonRead['contact']
 		self.version   = self.jsonRead['version']
-		self.resources = self.jsonRead['resources']
+		self.resources = self.jsonRead['packages']
 		self.configure()
 		self.installDependencies()
 	
@@ -126,11 +123,11 @@ class PackageManager():
 	"""
 	def isValidQuery(self, dependency):
 		result = False
-		onVerbose('checking if "%s" is valid' % str({'title':dependency['title'], 
+		onVerbose('checking if "%s" is valid' % str({'id':dependency['id'], 
 			'dest':dependency['dest']}), self.verbose)
 		if isinstance(dependency, dict): 
-			if 'title' in dependency and 'dest' in dependency:
-				if len(dependency['title']) > 0 and len(dependency['dest']) > 0:
+			if 'id' in dependency and 'dest' in dependency:
+				if len(dependency['id']) > 0 and len(dependency['dest']) > 0:
 					result = True
 		if not result:
 			onWarning('MalformedQuery', dependency)
@@ -146,9 +143,9 @@ class PackageManager():
 	"""	
 	def isDependency(self, dependency):
 		result = False
-		onVerbose('checking if "%s" is an actual dependency' % dependency['title'], self.verbose)
+		onVerbose('checking if "%s" is an actual dependency' % dependency['id'], self.verbose)
 		for i in self.resources:
-			if dependency['title'].lower() == i['title'].lower():
+			if dependency['id'].lower() == i['id'].lower():
 				result = True
 		if not result:
 			onWarning('InvalidDependency', dependency)
@@ -168,7 +165,7 @@ class PackageManager():
 				dependency['dest'] = dependency['dest'][:-1]
 			if dependency['dest'][0] != '/':
 				dependency['dest'] = '/%s' % dependency['dest']
-			onVerbose('reformatted %s\'s dest to "%s"' % (dependency['title'], dependency['dest']), self.verbose)
+			onVerbose('reformatted %s\'s dest to "%s"' % (dependency['id'], dependency['dest']), self.verbose)
 			return dependency
 	
 	"""
@@ -182,15 +179,15 @@ class PackageManager():
 	def linkDependency(self, dependency):
 		if self.isValidQuery(dependency) and self.isDependency(dependency):
 			dependency = self.formatQuery(dependency)
-			onVerbose('linking local and remote dependency keys for "%s"' % dependency['title'], self.verbose)
+			onVerbose('linking local and remote dependency keys for "%s"' % dependency['id'], self.verbose)
 			for i in self.resources:
-				if dependency['title'].lower() == i['title'].lower():
+				if dependency['id'].lower() == i['id'].lower():
 					for k, v in i.iteritems():
 						dependency[k] = i[k]
 			return dependency
 		else:
 			onError('UnexpectedError',
-				'encountered error when trying to link <%s>' % dependency['title'])
+				'encountered error when trying to link <%s>' % dependency['id'])
 	
 	"""
 	.. py:function:: isInstalled(self, dependency)
@@ -219,17 +216,13 @@ class PackageManager():
 		if self.isInstalled(self.linkDependency(dependency)):
 			onVerbose('checking that "%s" is not outdated' % dependency['name'], self.verbose)
 			execPath = '%s/%s' % (dependency['dest'], dependency['exec'])
-			readBuffer = StringIO.StringIO()
-			sys.stdout = readBuffer
-			exec(str(dependency['bene'] % execPath))
-			sys.stdout = sys.__stdout__
 			try:
-				result = float(readBuffer.getvalue()) >= float(dependency['version'])
+				result = float(__runProcess__('%s %s' % (execPath, dependency['bene']))) >= float(dependency['version'])
 			except ValueError:
 				result = False
 		else:
 			onError('NotInstalled',
-				'"%s" is not installed to "%s"' % (dependency['title'],
+				'"%s" is not installed to "%s"' % (dependency['id'],
 				dependency['dest']))
 		return result
 	
@@ -241,8 +234,8 @@ class PackageManager():
 		onVerbose('listing available dependencies', self.verbose)
 		outString = '%s v%s - by %s\n' % (os.path.basename(__file__), self.version, self.author)
 		for i in self.resources:
-			outString = '%s{"title":"%s", "name":"%s", "version":"%s"}\n' % (outString, 
-				i['title'], i['name'], i['version']) 
+			outString = '%s{"id":"%s", "name":"%s", "version":"%s", "link":"%s"}\n' % (outString, 
+				i['id'], i['name'], i['version'], i['link']) 
 		return outString	
 	
 	"""
@@ -268,13 +261,13 @@ class PackageManager():
 	def installDependencies(self):
 		try:
 			for i in self.requiredDependencies:
-				newSave = tempfile.mkstemp(suffix = '.zip', dir = '/tmp')
-				newDownload = urllib.urlretrieve(i['raw'], newSave[1])
+				newSave = tempfile.mkstemp(suffix = '.tar.gz', dir = '/tmp')
+				newDownload = urllib.urlretrieve('%s%s' % (MAIN, i['link']), newSave[1])
 				onVerbose('downloading "%s" to "%s"' % (i['name'], newSave[1]), self.verbose)
 				if not os.path.exists(i['dest']):
 					__runProcess__('mkdir %s' % i['dest'].replace(' ', '\ '))
 				onVerbose('installing "%s" to "%s"' % (i['name'], i['dest']), self.verbose)
-				__runProcess__('unzip -o %s -d %s' % (newSave[1], i['dest'].replace(' ', '\ ')))
+				__runProcess__('tar xopf %s -C %s' % (newSave[1], i['dest'].replace(' ', '\ ')))
 				__runProcess__('rm -rf %s' % newSave[1])
 		except Exception as e:
 			onError(type(e).__name__, e)
@@ -310,9 +303,11 @@ def logicArgs():
 		default = [], help = 'dependencies to install', metavar = 'PKG')
 	parser.add_argument('-o', dest = 'destinations', nargs = '*',
 		default = [], help = 'destination paths to place dependencies', metavar = 'DIR')
-	parser.add_argument('--list-dependencies', dest = 'list', default = False, 
+	parser.add_argument('--list-packages', dest = 'list', default = False, 
 		action = 'store_true', help = 'list all available dependencies')
 	parser.add_argument('--is-installed', dest = 'local', nargs = '*',
+		default = [], help = argparse.SUPPRESS)
+	parser.add_argument('--is-equal', dest = 'equal', nargs = '*',
 		default = [], help = argparse.SUPPRESS)
 	parser.add_argument('--is-outdated', dest = 'dated', nargs = '*',
 		default = [], help = argparse.SUPPRESS)
@@ -322,16 +317,25 @@ def logicArgs():
 	elif args.local:
 		if len(args.local) != 2:
 			onError('ArgumentError',
-				'arguments must be a set of two')
-		sys.stdout.write('%s\n' % PackageManager().isInstalled({'title':args.local[0], 
+				'arguments must be a set of two (id, dest)')
+		sys.stdout.write('%s\n' % PackageManager().isInstalled({'id':args.local[0], 
 			'dest':args.local[1]}))
 	elif args.dated:
 		if len(args.dated) != 2:
 			onError('ArgumentError',
-				'arguments must be a set of two')
-		oudated = not PackageManager().isEqual({'title':args.dated[0], 
+				'arguments must be a set of two (id, dest)')
+		oudated = not PackageManager().isEqual({'id':args.dated[0], 
 			'dest':args.dated[1]})
 		sys.stdout.write('%s\n' % oudated)
+	elif args.equal:
+		if len(args.equal) != 2:
+			onError('ArgumentError',
+				'arguments must be a set of two (id, dest)')
+		if PackageManager().isInstalled({'id':args.equal[0],
+			'dest':args.equal[1]}):
+			equal = PackageManager().isEqual({'id':args.equal[0],
+				'dest':args.equal[1]})
+		sys.stdout.write('%s\n' % equal)
 	elif args.version:
 		sys.stdout.write('%s\n' % PackageManager().version)
 	else:
@@ -343,8 +347,9 @@ def logicArgs():
 				'malformed arguments to format destinations for dependencies')
 		requiredDependencies = []
 		for k, v in dict(zip(args.dependencies, args.destinations)).iteritems():
-			requiredDependencies.append({'title':k, 'dest':v})
+			requiredDependencies.append({'id':k, 'dest':v})
 		PackageManager(requiredDependencies = requiredDependencies, verbose = args.verbose)
 	
 if __name__ in '__main__':
 	logicArgs()
+		

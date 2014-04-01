@@ -68,16 +68,16 @@ TITLE         = 'OmniTube'
 VERSION       = 4.2
 WORKFLOW      = os.path.dirname(os.path.abspath(__file__))
 RESOURCES     = '%s/Resources' % WORKFLOW
-GLYPHSETUP    = __formatSpaces__('%s/GlyphSetup' % WORKFLOW)
+GLYPHMANAGER  = __formatSpaces__('%s/GlyphManager' % WORKFLOW)
 NOTIFIER      = '/Applications/terminal-notifier.app/Contents/MacOS/terminal-notifier'
 COCOA         = '/Applications/cocoaDialog.app/Contents/MacOS/cocoaDialog'
 ICONS	 	  = '%s/Icons/' % RESOURCES
-PKG_MANAGER   = __formatSpaces__('%s/PackageManager' % WORKFLOW)
+PKG_MANAGER   = __formatSpaces__('%s/LuxePrisimPackageManager' % WORKFLOW)
 DEPENDENCIES  = [{'title':'terminal-notifier', 'dest':'/Applications'}, 
-	{'title':'chromedriver', 'dest':'%s/webdrivers' % __formatSpaces__(RESOURCES)},
-	{'title':'cocoadialog', 'dest':'/Applications'}, 
-	{'title':'glyphsetup', 'dest':__formatSpaces__(WORKFLOW)},
-	{'title':'omnitubeicons', 'dest':__formatSpaces__(RESOURCES)}]
+	{'title':'google.chromedriver', 'dest':'%s/webdrivers' % __formatSpaces__(RESOURCES)},
+	{'title':'mstratman.cocoadialog', 'dest':'/Applications'}, 
+	{'title':'ritashugisha.glyphmanager', 'dest':__formatSpaces__(WORKFLOW)},
+	{'title':'ritashugisha.omnitubeicons', 'dest':__formatSpaces__(RESOURCES)}]
 SUBSCRIPTIONS = '%s/Subscriptions/' % RESOURCES
 OAUTH_JSON    = '%s/oAuth.json' % RESOURCES
 DEVELOPER_KEY = 'QUkzOXNpN3RFWGM3dXVYbWNEU255a2pkdWxjOXotY3Q2cC11REdWYURnM0U0MXZwdXRTM1pnSk85WGdUb2JTU3lvWHhiQlVJajBQNXEwaG43bUlkYko1VDFkRWpKR0tIeXc='
@@ -430,7 +430,7 @@ def validStart():
 			newDependencies = '%s %s' % (newDependencies, i['title'])
 			newDestinations = '%s %s' % (newDestinations, i['dest'])
 		__runProcess__('%s -i%s -o%s' % (PKG_MANAGER, newDependencies, newDestinations))
-	__runProcess__('%s -light -light -dark -dark' % GLYPHSETUP)
+	__runProcess__('%s -light -light -dark -dark --suppress' % GLYPHMANAGER)
 	import OmniAuth
 	OmniAuth.validStart()	
 

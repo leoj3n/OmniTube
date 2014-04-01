@@ -542,6 +542,14 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
+				<string>84947FB0-1D6A-45BB-A91A-B610494117CA</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string>Add "{query}" to Favorites</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>0F5598EA-5994-4469-8280-1B9E806BEF58</string>
 				<key>modifiers</key>
 				<integer>262144</integer>
