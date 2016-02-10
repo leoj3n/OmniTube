@@ -7,7 +7,7 @@
 import re
 
 from lxml.cssselect import CSSSelector
-from zope.testbrowser.browser import Browser
+from zope.testbrowser.browser import Browser, ListControl
 from splinter.element_list import ElementList
 from splinter.exceptions import ElementDoesNotExist
 from splinter.driver import DriverAPI, ElementAPI
@@ -61,9 +61,9 @@ class ZopeTestBrowser(DriverAPI):
 
     driver_name = "zope.testbrowser"
 
-    def __init__(self, user_agent=None, wait_time=2):
+    def __init__(self, user_agent=None, wait_time=2, ignore_robots=False):
         self.wait_time = wait_time
-        mech_browser = self._get_mech_browser(user_agent)
+        mech_browser = self._get_mech_browser(user_agent, ignore_robots)
         self._browser = Browser(mech_browser=mech_browser)
 
         self._cookie_manager = CookieManager(self._browser.cookies)
@@ -142,7 +142,8 @@ class ZopeTestBrowser(DriverAPI):
         find_by = original_find or "xpath"
         query = original_selector or xpath
 
-        return ElementList([ZopeTestBrowserElement(element, self) for element in elements], find_by=find_by, query=query)
+        return ElementList(
+            [ZopeTestBrowserElement(element, self) for element in elements], find_by=find_by, query=query)
 
     def find_by_tag(self, tag):
         return self.find_by_xpath('//%s' % tag, original_find="tag", original_selector=tag)
@@ -150,8 +151,13 @@ class ZopeTestBrowser(DriverAPI):
     def find_by_value(self, value):
         return self.find_by_xpath('//*[@value="%s"]' % value, original_find="value", original_selector=value)
 
+    def find_by_text(self, text):
+        return self.find_by_xpath('//*[text()="%s"]' % text,
+                                  original_find="text", original_selector=text)
+
     def find_by_id(self, id_value):
-        return self.find_by_xpath('//*[@id="%s"][1]' % id_value, original_find="id", original_selector=id_value)
+        return self.find_by_xpath(
+            '//*[@id="%s"][1]' % id_value, original_find="id", original_selector=id_value)
 
     def find_by_name(self, name):
         elements = []
@@ -164,7 +170,9 @@ class ZopeTestBrowser(DriverAPI):
                 index += 1
             except LookupError:
                 break
-        return ElementList([ZopeTestBrowserControlElement(element, self) for element in elements], find_by="name", query=name)
+        return ElementList(
+            [ZopeTestBrowserControlElement(element, self) for element in elements],
+            find_by="name", query=name)
 
     def find_link_by_text(self, text):
         return self._find_links_by_xpath("//a[text()='%s']" % text)
@@ -219,7 +227,8 @@ class ZopeTestBrowser(DriverAPI):
     def _find_links_by_xpath(self, xpath):
         html = self.htmltree
         links = html.xpath(xpath)
-        return ElementList([ZopeTestBrowserLinkElement(link, self) for link in links], find_by="xpath", query=xpath)
+        return ElementList(
+            [ZopeTestBrowserLinkElement(link, self) for link in links], find_by="xpath", query=xpath)
 
     def select(self, name, value):
         self.find_by_name(name).first._control.value = [value]
@@ -258,10 +267,15 @@ class ZopeTestBrowser(DriverAPI):
     def _element_is_control(self, element):
         return hasattr(element, 'type')
 
-    def _get_mech_browser(self, user_agent):
+    def _get_mech_browser(self, user_agent, ignore_robots):
         mech_browser = mechanize.Browser()
+
         if user_agent is not None:
             mech_browser.addheaders = [("User-agent", user_agent), ]
+
+        if ignore_robots:
+            mech_browser.set_handle_robots(False)
+
         return mech_browser
 
     @property
@@ -301,6 +315,9 @@ class ZopeTestBrowserElement(ElementAPI):
         elements = self._element.cssselect('[value="%s"]' % value)
         return ElementList([self.__class__(element, self) for element in elements])
 
+    def find_by_text(self, text):
+        return self.find_by_xpath('//*[text()="%s"]' % text)
+
     def find_by_id(self, id):
         elements = self._element.cssselect('#%s' % id)
         return ElementList([self.__class__(element, self) for element in elements])
@@ -315,7 +332,7 @@ class ZopeTestBrowserElement(ElementAPI):
 
     @property
     def outer_html(self):
-        return lxml.html.tostring(self._element, encoding=unicode).strip()
+        return lxml.html.tostring(self._element, encoding='unicode').strip()
 
     @property
     def html(self):
@@ -349,7 +366,10 @@ class ZopeTestBrowserControlElement(ZopeTestBrowserElement):
 
     @property
     def value(self):
-        return self._control.value
+        value = self._control.value
+        if isinstance(self._control, ListControl) and len(value) == 1:
+            return value[0]
+        return value
 
     @property
     def checked(self):
@@ -363,6 +383,7 @@ class ZopeTestBrowserControlElement(ZopeTestBrowserElement):
 
     def select(self, value):
         self._control.value = [value]
+
 
 class ZopeTestBrowserOptionElement(ZopeTestBrowserElement):
 

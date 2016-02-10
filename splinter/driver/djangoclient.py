@@ -7,7 +7,9 @@
 from __future__ import with_statement
 import os.path
 import re
-import time
+import sys
+import six
+from six.moves.urllib import parse
 
 import lxml.html
 from lxml.cssselect import CSSSelector
@@ -54,7 +56,7 @@ class CookieManager(CookieManagerAPI):
     def __eq__(self, other_object):
         if isinstance(other_object, dict):
             cookies_dict = dict([(key, morsel.value)
-                                 for key, morsel in self._cookies.iteritems()])
+                                 for key, morsel in self._cookies.items()])
             return cookies_dict == other_object
 
 
@@ -62,11 +64,14 @@ class DjangoClient(DriverAPI):
 
     driver_name = "django"
 
-    def __init__(self, user_agent=None, wait_time=2):
+    def __init__(self, user_agent=None, wait_time=2, **kwargs):
         from django.test.client import Client
         self.wait_time = wait_time
-        self._browser = Client()
+        self._custom_headers = kwargs.pop('custom_headers', {})
+        client_kwargs = dict((key.replace('client_', ''), value) for (key, value) in six.iteritems(kwargs) if key.startswith('client_'))
+        self._browser = Client(**client_kwargs)
         self._history = []
+        self._user_agent = user_agent
 
         self._cookie_manager = CookieManager(self._browser.cookies)
         self._last_urls = []
@@ -86,18 +91,39 @@ class DjangoClient(DriverAPI):
             pass
         self.status_code = StatusCode(self._response.status_code, '')
 
+    def _handle_redirect_chain(self):
+        if self._response.redirect_chain:
+            for redirect_url, redirect_code in self._response.redirect_chain:
+                self._last_urls.append(redirect_url)
+            self._url = self._last_urls[-1]
+
+    def _set_extra_params(self, url):
+        extra = {}
+        components = parse.urlparse(url)
+        if components.hostname:
+            extra.update({'SERVER_NAME': components.hostname})
+        if components.port:
+            extra.update({'SERVER_PORT': components.port})
+        if self._user_agent:
+            extra.update({'User-Agent': self._user_agent})
+        if self._custom_headers:
+            extra.update(self._custom_headers)
+        return extra
+
     def visit(self, url):
         self._url = url
-        self._response = self._browser.get(url, follow=True)
+        extra = self._set_extra_params(url)
+        self._response = self._browser.get(url, follow=True, **extra)
         self._last_urls.append(url)
+        self._handle_redirect_chain()
         self._post_load()
 
     def submit(self, form):
         method = form.attrib['method']
         func_method = getattr(self._browser, method.lower())
-        action = form.attrib['action']
+        action = form.attrib.get('action', '')
         if action.strip() != '.':
-            url = os.path.join(self._url, form.attrib['action'])
+            url = os.path.join(self._url, form.attrib.get('action', ''))
         else:
             url = self._url
         self._url = url
@@ -105,8 +131,10 @@ class DjangoClient(DriverAPI):
         for key in form.inputs.keys():
             input = form.inputs[key]
             if getattr(input, 'type', '') == 'file' and key in data:
-                data[key] = open(data[key])
-        self._response = func_method(url, data, follow=True)
+                data[key] = open(data[key], 'rb')
+        extra = self._set_extra_params(url)
+        self._response = func_method(url, data, follow=True, **extra)
+        self._handle_redirect_chain()
         self._post_load()
         return self._response
 
@@ -131,17 +159,17 @@ class DjangoClient(DriverAPI):
         try:
             return self._html
         except AttributeError:
-            self._html = lxml.html.fromstring(self.html.decode('utf-8'))
+            self._html = lxml.html.fromstring(self.html)
             return self._html
 
     @property
     def title(self):
         html = self.htmltree
-        return html.xpath('//title')[0].text_content().strip().encode('utf-8')
+        return html.xpath('//title')[0].text_content().strip()
 
     @property
     def html(self):
-        return self._response.content
+        return self._response.content.decode(self._response._charset or 'utf-8')
 
     @property
     def url(self):
@@ -179,7 +207,9 @@ class DjangoClient(DriverAPI):
         find_by = original_find or "xpath"
         query = original_selector or xpath
 
-        return ElementList([element_class(element, self) for element_class, element in elements], find_by=find_by, query=query)
+        return ElementList(
+            [element_class(element, self) for element_class, element in elements],
+            find_by=find_by, query=query)
 
     def find_by_tag(self, tag):
         return self.find_by_xpath('//%s' % tag, original_find="tag", original_selector=tag)
@@ -187,8 +217,12 @@ class DjangoClient(DriverAPI):
     def find_by_value(self, value):
         return self.find_by_xpath('//*[@value="%s"]' % value, original_find="value", original_selector=value)
 
+    def find_by_text(self, text):
+        return self.find_by_xpath('//*[text()="%s"]' % text, original_find="text", original_selector=text)
+
     def find_by_id(self, id_value):
-        return self.find_by_xpath('//*[@id="%s"][1]' % id_value, original_find="id", original_selector=id_value)
+        return self.find_by_xpath(
+            '//*[@id="%s"][1]' % id_value, original_find="id", original_selector=id_value)
 
     def find_by_name(self, name):
         html = self.htmltree
@@ -202,7 +236,8 @@ class DjangoClient(DriverAPI):
         find_by = "name"
         query = xpath
 
-        return ElementList([DjangoClientControlElement(element, self) for element in elements], find_by=find_by, query=query)
+        return ElementList(
+            [DjangoClientControlElement(element, self) for element in elements], find_by=find_by, query=query)
 
     def find_link_by_text(self, text):
         return self._find_links_by_xpath("//a[text()='%s']" % text)
@@ -255,38 +290,25 @@ class DjangoClient(DriverAPI):
     def _find_links_by_xpath(self, xpath):
         html = self.htmltree
         links = html.xpath(xpath)
-        return ElementList([DjangoClientLinkElement(link, self) for link in links], find_by="xpath", query=xpath)
+        return ElementList(
+            [DjangoClientLinkElement(link, self) for link in links], find_by="xpath", query=xpath)
 
     def select(self, name, value):
         self.find_by_name(name).first._control.value = value
 
     def is_text_present(self, text, wait_time=None):
-        wait_time = wait_time or self.wait_time
-        end_time = time.time() + wait_time
-
-        while time.time() < end_time:
-            if self._is_text_present(text):
-                return True
-        return False
+        return self._is_text_present(text)
 
     def _is_text_present(self, text):
         try:
             body = self.find_by_tag('body').first
             return text in body.text
         except ElementDoesNotExist:
-            # This exception will be thrown if the body tag isn't present
-            # This has occasionally been observed. Assume that the
-            # page isn't fully loaded yet
-            return False
+            # In case of non html input check text directly:
+            return text in self.html
 
     def is_text_not_present(self, text, wait_time=None):
-        wait_time = wait_time or self.wait_time
-        end_time = time.time() + wait_time
-
-        while time.time() < end_time:
-            if not self._is_text_present(text):
-                return True
-        return False
+        return not self._is_text_present(text)
 
     def _element_is_link(self, element):
         return element.tag == 'a'
@@ -331,6 +353,9 @@ class DjangoClientElement(ElementAPI):
         elements = self._element.cssselect('[value="%s"]' % value)
         return ElementList([self.__class__(element, self) for element in elements])
 
+    def find_by_text(self, text):
+        return self.find_by_xpath('//*[text()="%s"]' % text)
+
     def find_by_id(self, id):
         elements = self._element.cssselect('#%s' % id)
         return ElementList([self.__class__(element, self) for element in elements])
@@ -345,7 +370,7 @@ class DjangoClientElement(ElementAPI):
 
     @property
     def outer_html(self):
-        return lxml.html.tostring(self._element, encoding=unicode).strip()
+        return lxml.html.tostring(self._element, encoding='unicode').strip()
 
     @property
     def html(self):
@@ -391,13 +416,16 @@ class DjangoClientControlElement(DjangoClientElement):
 
     def fill(self, value):
         parent_form = self._get_parent_form()
-        parent_form.fields[self['name']] = value.decode('utf-8')
+        if sys.version_info[0] > 2:
+            parent_form.fields[self['name']] = value
+        else:
+            parent_form.fields[self['name']] = value.decode('utf-8')
 
     def select(self, value):
         self._control.value = value
 
     def _get_parent_form(self):
-        parent_form = self._control.iterancestors('form').next()
+        parent_form = next(self._control.iterancestors('form'))
         return self.parent._forms.setdefault(parent_form._name(), parent_form)
 
 
