@@ -85,10 +85,10 @@ CLIENT_ID     = 'NDk0NDY3MDg2NjMxLTZ0cDRrbjk4dGZoNXI5NnAyYTFkNmNlNXUzNm10N2hyLmF
 CLIENT_SECRET = 'WDNlc3VqVklwWDVsc3pOdVpuMjcxUmoz'
 INTRO_HTML    = 'http://www.ritashugisha.co.nf/OmniTube/index.html'
 BASE_1        	   = 'https://accounts.google.com/o/oauth2'
-BASE_2        	   = 'https://gdata.youtube.com/feeds/api'
+BASE_2        	   = 'https://www.googleapis.com/youtube/v3'
 BASE_OAUTH         = '%s/auth' % BASE_1
 BASE_OAUTH_TOKEN   = '%s/token' % BASE_1
-BASE_PROFILE       = '%s/users/default' % BASE_2
+BASE_PROFILE       = '%s/channels?part=snippet,contentDetails,brandingSettings,invideoPromotion&mine=true' % BASE_2
 BASE_UPLOADS       = '%s/users/default/uploads' % BASE_2
 BASE_USER          = '%s/users/%s' % (BASE_2, '%s')
 BASE_USER_UPLOADS  = '%s/users/%s/uploads' % (BASE_2, '%s')
@@ -223,8 +223,8 @@ def jsonLoad(baseURL, param1 = {}):
 		return json.loads(urllib.urlopen('%s?access_token=%s&v=%s&alt=json&%s' % (baseURL, 
 			OmniAuth.getOAuth()['access_token'], '2', urllib.urlencode(param1))).read())
 	else:
-		return json.loads(urllib.urlopen('%s?access_token=%s&v=%s&alt=json' % (baseURL, 
-			OmniAuth.getOAuth()['access_token'], '2')).read())
+		return json.loads(urllib.urlopen('%s&access_token=%s' % (baseURL, 
+			OmniAuth.getOAuth()['access_token'])).read())
 
 """
 .. py:function:: gdataLoad(baseURL, tag1, tag2)
